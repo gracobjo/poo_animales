@@ -25,6 +25,7 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 | Crear las carpetas por primera vez (PowerShell) | [Manual, sección 2](docs/manual_desarrollador.md#2-crear-las-carpetas-por-primera-vez) |
 | Añadir una especie nueva (ej. loro) | [Manual, sección 7](docs/manual_desarrollador.md#7-cómo-añadir-una-especie) |
 | Ejecutar la demo o los tests | [Instrucciones de ejecución](#instrucciones-de-ejecución) más abajo |
+| Probar la API con Swagger | [API HTTP y Swagger](docs/api_swagger.md) · [sección abajo](#api-http-opcional-swagger) |
 | Ver un ejemplo de código mínimo | [Ejemplo de uso](#ejemplo-de-uso) más abajo |
 
 ### Índice de documentos
@@ -34,7 +35,8 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 | [Documentación técnica y pedagógica](docs/documentacion_tecnica_pedagogica.md) | `docs/documentacion_tecnica_pedagogica.md` | Alumnado / docencia | Proceso completo: requisitos, dominio, diseño, etapas de código, pruebas, pilares y checklist |
 | [Tutorial de especialización](docs/tutorial_especializacion.md) | `docs/tutorial_especializacion.md` | Alumnado / curso | 10 unidades, ejemplos guiados, POO vs `dict`, autoevaluación y [solucionario completo](docs/tutorial_especializacion.md#solucionario-completo) |
 | [Casos de uso](docs/casos_de_uso.md) | `docs/casos_de_uso.md` | Análisis / producto | CU-01 a CU-19: flujos, errores y postcondiciones |
-| [Manual de desarrollador](docs/manual_desarrollador.md) | `docs/manual_desarrollador.md` | Desarrolladores | Estructura, API, errores, pruebas, cómo extender |
+| [Manual de desarrollador](docs/manual_desarrollador.md) | `docs/manual_desarrollador.md` | Desarrolladores | Estructura, API de dominio, errores, pruebas, cómo extender |
+| [API HTTP y Swagger](docs/api_swagger.md) | `docs/api_swagger.md` | Ampliación opcional | FastAPI, endpoints REST y Swagger UI en `/docs` |
 
 En GitHub también puedes abrirlos desde el repositorio:
 
@@ -42,6 +44,7 @@ En GitHub también puedes abrirlos desde el repositorio:
 - [Tutorial](https://github.com/gracobjo/poo_animales/blob/main/docs/tutorial_especializacion.md)
 - [Casos de uso](https://github.com/gracobjo/poo_animales/blob/main/docs/casos_de_uso.md)
 - [Manual](https://github.com/gracobjo/poo_animales/blob/main/docs/manual_desarrollador.md)
+- [API / Swagger](https://github.com/gracobjo/poo_animales/blob/main/docs/api_swagger.md)
 
 ## Conceptos implementados
 
@@ -72,8 +75,10 @@ animales_poo/
 ├── main.py
 ├── README.md
 ├── .gitignore
+├── requirements.txt          # Dependencias de la API (opcional)
 ├── docs/
 │   ├── documentacion_tecnica_pedagogica.md
+│   ├── api_swagger.md
 │   ├── casos_de_uso.md
 │   ├── manual_desarrollador.md
 │   └── tutorial_especializacion.md
@@ -82,6 +87,11 @@ animales_poo/
 │   └── demo_completa.py
 ├── src/
 │   ├── __init__.py
+│   ├── api/                  # FastAPI + Swagger (opcional)
+│   │   ├── __init__.py
+│   │   ├── app.py
+│   │   ├── schemas.py
+│   │   └── store.py
 │   ├── modelos/
 │   │   ├── __init__.py
 │   │   ├── animal.py
@@ -98,7 +108,8 @@ animales_poo/
     ├── __init__.py
     ├── test_perro.py
     ├── test_gato.py
-    └── test_loro.py
+    ├── test_loro.py
+    └── test_api.py
 ```
 
 ## Instrucciones de ejecución
@@ -116,6 +127,19 @@ Para lanzar las pruebas unitarias:
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+## API HTTP opcional (Swagger)
+
+El núcleo POO no necesita dependencias. Si quieres una API REST con
+documentación interactiva:
+
+```bash
+pip install -r requirements.txt
+uvicorn src.api.app:app --reload
+```
+
+Abre **http://127.0.0.1:8000/docs** (Swagger UI). Detalle de endpoints:
+[docs/api_swagger.md](docs/api_swagger.md).
 
 ## Ejemplo de uso
 

@@ -760,6 +760,7 @@ Ideas razonables para continuar aprendiendo (sin reescribir todo):
 3. **Capa de aplicación:** un pequeño menú CLI o notebook didáctico.
 4. **Más tests de integración automatizados** (además de la demo narrativa).
 5. **(Avanzado)** introducir un patrón *Strategy* para la recuperación de energía al comer, o un *Factory* para crear animales desde un registro de configuración — solo cuando el diseño lo pida de verdad.
+6. **Capa HTTP + Swagger** (ya disponible como ampliación opcional): ver [api_swagger.md](api_swagger.md). No sustituye el aprendizaje de POO; expone el mismo dominio por REST.
 
 ---
 

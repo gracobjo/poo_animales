@@ -1,13 +1,14 @@
 # Manual de desarrollador
 
-Guía para entender, ejecutar y extender el proyecto. El lector que solo quiere ver la demo puede quedarse en el [README](../README.md). Los escenarios funcionales están en [Casos de uso](casos_de_uso.md). Para el proceso completo de desarrollo (análisis → pruebas), ver la [Documentación técnica y pedagógica](documentacion_tecnica_pedagogica.md). Para un curso paso a paso (incluye comparación con `dict`), ver el [Tutorial de especialización](tutorial_especializacion.md).
+Guía para entender, ejecutar y extender el proyecto. El lector que solo quiere ver la demo puede quedarse en el [README](../README.md). Los escenarios funcionales están en [Casos de uso](casos_de_uso.md). Para el proceso completo de desarrollo (análisis → pruebas), ver la [Documentación técnica y pedagógica](documentacion_tecnica_pedagogica.md). Para un curso paso a paso (incluye comparación con `dict`), ver el [Tutorial de especialización](tutorial_especializacion.md). La capa HTTP opcional con Swagger está en [API HTTP y Swagger](api_swagger.md).
 
 Repositorio: [https://github.com/gracobjo/poo_animales](https://github.com/gracobjo/poo_animales)
 
 ## 1. Requisitos
 
 - Python 3.8 o superior.
-- Biblioteca estándar. No hay dependencias que instalar.
+- **Núcleo POO:** biblioteca estándar. No hay dependencias que instalar para `main.py` ni para los tests de modelos.
+- **API opcional (Swagger):** `pip install -r requirements.txt` y luego `uvicorn src.api.app:app --reload`. Detalle en [api_swagger.md](api_swagger.md).
 - Sistema operativo indiferente. Los comandos de esta guía asumen que el directorio actual es la raíz del proyecto.
 
 Comprobar la versión:
@@ -61,6 +62,13 @@ Crear-Archivo "animales_poo\docs\casos_de_uso.md"
 Crear-Archivo "animales_poo\docs\manual_desarrollador.md"
 Crear-Archivo "animales_poo\docs\tutorial_especializacion.md"
 Crear-Archivo "animales_poo\docs\documentacion_tecnica_pedagogica.md"
+Crear-Archivo "animales_poo\docs\api_swagger.md"
+Crear-Archivo "animales_poo\src\api\__init__.py"
+Crear-Archivo "animales_poo\src\api\app.py"
+Crear-Archivo "animales_poo\src\api\schemas.py"
+Crear-Archivo "animales_poo\src\api\store.py"
+Crear-Archivo "animales_poo\tests\test_api.py"
+Crear-Archivo "animales_poo\requirements.txt"
 Crear-Archivo "animales_poo\.gitignore"
 ```
 
@@ -82,6 +90,7 @@ animales_poo
 ├── .gitignore
 ├── docs
 │   ├── documentacion_tecnica_pedagogica.md
+│   ├── api_swagger.md
 │   ├── casos_de_uso.md
 │   ├── manual_desarrollador.md
 │   └── tutorial_especializacion.md
@@ -90,6 +99,11 @@ animales_poo
 │   └── demo_completa.py
 ├── src
 │   ├── __init__.py
+│   ├── api
+│   │   ├── __init__.py
+│   │   ├── app.py
+│   │   ├── schemas.py
+│   │   └── store.py
 │   ├── modelos
 │   │   ├── __init__.py
 │   │   ├── animal.py
@@ -106,7 +120,8 @@ animales_poo
     ├── __init__.py
     ├── test_perro.py
     ├── test_gato.py
-    └── test_loro.py
+    ├── test_loro.py
+    └── test_api.py
 ```
 
 Si falta una rama, vuelve a la carpeta padre (`cd ..`) y repite solo la llamada `Crear-Archivo` de esa ruta. Los archivos quedan vacíos: el código se escribe después, en cada uno.
@@ -566,3 +581,4 @@ Cuando la demo ejecuta `emitir_sonido(animal)` dentro de un bucle con un perro, 
 | Enseñar el proyecto | `ejemplos/demo_completa.py` y `main.py` |
 | Añadir una especie nueva | Sección 7 de este manual; ejemplo en `loro.py` |
 | Describir una acción del cuidador | `docs/casos_de_uso.md` |
+| Exponer el dominio por HTTP / Swagger | `src/api/` y [api_swagger.md](api_swagger.md) |
