@@ -16,6 +16,7 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 
 | Si quieres… | Abre |
 | --- | --- |
+| Empezar un proyecto POO nuevo (plantilla reutilizable) | [Plantilla maestra de diseño](docs/PLANTILLA_DISENO.md) · [acceso rápido](PLANTILLA_DISENO.md) |
 | Entender el proceso completo (análisis → pruebas) | [Documentación técnica y pedagógica](docs/documentacion_tecnica_pedagogica.md) |
 | Aprender POO con ejercicios (curso) | [Tutorial de especialización](docs/tutorial_especializacion.md) |
 | Ver las soluciones de los ejercicios | [Tutorial → Solucionario completo](docs/tutorial_especializacion.md#solucionario-completo) |
@@ -32,6 +33,7 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 
 | Documento | Ruta | Público | Contenido |
 | --- | --- | --- | --- |
+| [Plantilla maestra de diseño](docs/PLANTILLA_DISENO.md) | `docs/PLANTILLA_DISENO.md` | Cualquier proyecto POO nuevo | Fases 0–5: alcance, carpetas, diseño OOP, orden de código, checklist y escalado |
 | [Documentación técnica y pedagógica](docs/documentacion_tecnica_pedagogica.md) | `docs/documentacion_tecnica_pedagogica.md` | Alumnado / docencia | Proceso completo: requisitos, dominio, diseño, etapas de código, pruebas, pilares y checklist |
 | [Tutorial de especialización](docs/tutorial_especializacion.md) | `docs/tutorial_especializacion.md` | Alumnado / curso | 10 unidades, ejemplos guiados, POO vs `dict`, autoevaluación y [solucionario completo](docs/tutorial_especializacion.md#solucionario-completo) |
 | [Casos de uso](docs/casos_de_uso.md) | `docs/casos_de_uso.md` | Análisis / producto | CU-01 a CU-19: flujos, errores y postcondiciones |
@@ -40,6 +42,7 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 
 En GitHub también puedes abrirlos desde el repositorio:
 
+- [Plantilla maestra](https://github.com/gracobjo/poo_animales/blob/main/docs/PLANTILLA_DISENO.md)
 - [Documentación técnica y pedagógica](https://github.com/gracobjo/poo_animales/blob/main/docs/documentacion_tecnica_pedagogica.md)
 - [Tutorial](https://github.com/gracobjo/poo_animales/blob/main/docs/tutorial_especializacion.md)
 - [Casos de uso](https://github.com/gracobjo/poo_animales/blob/main/docs/casos_de_uso.md)
@@ -76,7 +79,9 @@ animales_poo/
 ├── README.md
 ├── .gitignore
 ├── requirements.txt          # Dependencias de la API (opcional)
+├── PLANTILLA_DISENO.md       # Acceso rápido → docs/PLANTILLA_DISENO.md
 ├── docs/
+│   ├── PLANTILLA_DISENO.md   # Plantilla maestra reutilizable (POO)
 │   ├── documentacion_tecnica_pedagogica.md
 │   ├── api_swagger.md
 │   ├── casos_de_uso.md

@@ -71,6 +71,7 @@ Al terminar, el estudiante debería ser capaz de:
 | Documento | Enfoque |
 | --- | --- |
 | **Este documento** | Proceso completo: análisis → diseño → código → pruebas → pedagogía |
+| [Plantilla maestra de diseño](PLANTILLA_DISENO.md) | Documento vivo para copiar a *cualquier* proyecto POO nuevo |
 | [Tutorial de especialización](tutorial_especializacion.md) | Curso con ejercicios y solucionario |
 | [Casos de uso](casos_de_uso.md) | Flujos del cuidador (CU) |
 | [Manual de desarrollador](manual_desarrollador.md) | API y cómo extender |

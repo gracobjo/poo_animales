@@ -1,6 +1,6 @@
 # Manual de desarrollador
 
-Guía para entender, ejecutar y extender el proyecto. El lector que solo quiere ver la demo puede quedarse en el [README](../README.md). Los escenarios funcionales están en [Casos de uso](casos_de_uso.md). Para el proceso completo de desarrollo (análisis → pruebas), ver la [Documentación técnica y pedagógica](documentacion_tecnica_pedagogica.md). Para un curso paso a paso (incluye comparación con `dict`), ver el [Tutorial de especialización](tutorial_especializacion.md). La capa HTTP opcional con Swagger está en [API HTTP y Swagger](api_swagger.md).
+Guía para entender, ejecutar y extender el proyecto. El lector que solo quiere ver la demo puede quedarse en el [README](../README.md). Los escenarios funcionales están en [Casos de uso](casos_de_uso.md). Para el proceso completo de desarrollo (análisis → pruebas), ver la [Documentación técnica y pedagógica](documentacion_tecnica_pedagogica.md). Para un curso paso a paso (incluye comparación con `dict`), ver el [Tutorial de especialización](tutorial_especializacion.md). La capa HTTP opcional con Swagger está en [API HTTP y Swagger](api_swagger.md). Para clonar el enfoque en otro dominio, usa la [Plantilla maestra de diseño](PLANTILLA_DISENO.md).
 
 Repositorio: [https://github.com/gracobjo/poo_animales](https://github.com/gracobjo/poo_animales)
 
