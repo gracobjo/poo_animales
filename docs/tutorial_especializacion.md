@@ -31,6 +31,12 @@ Al terminar este tutorial serás capaz de:
 | [Casos de uso](casos_de_uso.md) | Qué puede hacer el cuidador |
 | [Manual de desarrollador](manual_desarrollador.md) | API y guía para añadir especies |
 | Este tutorial | Recorrido pedagógico paso a paso |
+| [Solucionario](#solucionario-completo) | Respuestas a los ejercicios y a las preguntas de reflexión |
+
+> **Alumnado:** intenta cada ejercicio antes de abrir el
+> [solucionario](#solucionario-completo).  
+> **Docencia:** el solucionario sirve para corregir o para la sesión de
+> revisión.
 
 ---
 
@@ -58,6 +64,8 @@ python -m unittest discover -s tests -v
 - Qué mensaje sale al intentar `Animal("Fantasma", 1)`.
 
 Comprueba tus notas con la salida de `python main.py`.
+Cuando termines, contrasta con la
+[solución del ejercicio 0](#solución-ejercicio-0).
 
 ---
 
@@ -161,7 +169,8 @@ print(total_peso(animales))  # ¿tiene sentido un peso negativo?
 mayor que cero” para que nadie pueda saltársela?
 
 Guarda esa respuesta: en POO la respuesta es el *setter* de la propiedad
-`peso`.
+`peso`. Solución desarrollada:
+[ejercicio 1](#solución-ejercicio-1).
 
 ---
 
@@ -225,7 +234,8 @@ print(isinstance(rex, Animal))
 
 **Comparación con dict:** con un diccionario no hay forma de *impedir*
 crear un animal incompleto. Con `ABC`, Python lo impide en tiempo de
-ejecución.
+ejecución. Solución:
+[ejercicio 2](#solución-ejercicio-2).
 
 ---
 
@@ -279,6 +289,8 @@ print(loro.tipo_alimentacion())
 **Comparación con dict:** en el enfoque con diccionarios, “aprender una
 frase” sería otra función suelta y otra clave opcional. Aquí el método
 vive *dentro* del loro y solo el loro sabe cómo actualizar `__frase`.
+Solución (incl. energía tras jugar):
+[ejercicio 3](#solución-ejercicio-3).
 
 ---
 
@@ -349,7 +361,8 @@ animal["vacunado"] = False   # cualquiera puede mentir
 ```
 
 Con clases, la regla vive **junto al dato**. Quien usa el objeto no
-puede saltársela sin provocar un error explícito.
+puede saltársela sin provocar un error explícito. Solución:
+[ejercicio 4](#solución-ejercicio-4).
 
 ---
 
@@ -433,7 +446,8 @@ def emitir_sonido_poo(animal) -> str:
 **Cuándo sí usar un `dict`:** lecturas de JSON, configuración, tablas
 temporales, o cuando el dato es solo un registro sin comportamiento.  
 **Cuándo preferir clases:** cuando el dato tiene reglas, acciones y
-variantes (perro / gato / loro).
+variantes (perro / gato / loro). Solución del ejercicio 5:
+[aquí](#solución-ejercicio-5).
 
 ---
 
@@ -476,8 +490,9 @@ Abre cada archivo y responde (una frase por archivo):
 6. `validadores.py` — ¿Por qué se rechaza un `bool` aunque sea
    subclase de `int`?
 
-Contrasta tus respuestas con los [casos de uso](casos_de_uso.md) y el
-[manual](manual_desarrollador.md).
+Contrasta tus respuestas con los [casos de uso](casos_de_uso.md), el
+[manual](manual_desarrollador.md) y la
+[solución del ejercicio 6](#solución-ejercicio-6).
 
 ---
 
@@ -529,21 +544,9 @@ jugar con poca energía: eso lo controla `jugar()`).
 3. Llama a `dormir()` y vuelve a `cazar()`.
 4. Comprueba `presas_cazadas == 1`.
 
-Solución esperada (no mires hasta intentarlo):
-
-```python
-from src.modelos.gato import Gato
-
-misi = Gato("Misi", 3, 4.5, "blanco", energia=10)
-try:
-    misi.cazar()
-except ValueError:
-    pass
-assert misi.presas_cazadas == 0
-misi.dormir()
-misi.cazar()
-assert misi.presas_cazadas == 1
-```
+Inténtalo sin mirar. La solución completa (con asserts de energía y
+presas) está en el
+[solucionario, ejercicio 7](#solución-ejercicio-7).
 
 ---
 
@@ -575,7 +578,8 @@ Sin implementar todavía (o implementándolo si tienes tiempo), responde:
 - [ ] Tests en verde: `python -m unittest discover -s tests -v`
 
 **Lo que no tocas:** `animal.py` (salvo datos comunes a todos) ni
-`gestion_animales.py`.
+`gestion_animales.py`. Diseño de referencia y esqueleto:
+[solución del ejercicio 8](#solución-ejercicio-8).
 
 ---
 
@@ -597,6 +601,8 @@ Sin implementar todavía (o implementándolo si tienes tiempo), responde:
 Escribe en 10 líneas (como máximo) por qué, en este dominio de animales
 con energía, vacunas y frases, las clases son más adecuadas que una
 lista de diccionarios. Usa al menos dos pilares de POO en tu respuesta.
+Respuesta modelo y criterios:
+[solución del mini-reto](#solución-del-mini-reto-final).
 
 ---
 
@@ -614,21 +620,366 @@ Marca lo que ya sabes hacer sin mirar apuntes:
 
 Si marcas menos de 5, repite las unidades 2, 4 y 5.  
 Si marcas 7, estás listo para el ejercicio del `Caballo` (unidad 8).
+Criterios de comprobación:
+[solución orientativa de la autoevaluación](#solución-orientativa-de-la-autoevaluación).
 
 ---
 
-## Solucionario breve de los ejercicios guiados
+## Solucionario completo
 
-| Ej. | Idea de la solución |
+Respuestas a los ejercicios guiados, a las preguntas de reflexión y al
+mini-reto. Úsalo después de intentarlo por tu cuenta.
+
+### Índice del solucionario
+
+| Ejercicio | Tema |
 | --- | --- |
-| 0 | 3 animales; segunda vacuna → `ValueError`; `Animal` → `TypeError` |
-| 1 | El peso negativo se acepta en el dict; el loro sin rama falla o hay que ampliar `hacer_sonido` |
-| 2 | Abstracción vía `ABC`; `Perro` sí es `Animal` |
-| 3 | Tras jugar: energía 60; alimentaciones distintas por especie |
-| 4 | Setter rechaza; `__peso` no existe fuera; `vacunado` sin setter |
-| 5 | Tres sonidos distintos con el mismo `emitir_sonido` |
-| 7 | Cazar falla con energía 10; tras dormir, una presa |
-| 8 | Nueva clase + export + tests; servicios intactos |
+| [0](#solución-ejercicio-0) | Demo y abstracción en la práctica |
+| [1](#solución-ejercicio-1) | Fragilidad del enfoque con `dict` |
+| [2](#solución-ejercicio-2) | `ABC` y `isinstance` |
+| [3](#solución-ejercicio-3) | Herencia y energía al jugar |
+| [4](#solución-ejercicio-4) | Encapsulamiento y solo lectura |
+| [5](#solución-ejercicio-5) | Polimorfismo con servicios |
+| [6](#solución-ejercicio-6) | Lectura del código del repositorio |
+| [7](#solución-ejercicio-7) | Cazar con poca energía |
+| [8](#solución-ejercicio-8) | Diseño de un `Caballo` |
+| [Mini-reto](#solución-del-mini-reto-final) | Por qué POO frente a `dict` |
+| [Autoevaluación](#solución-orientativa-de-la-autoevaluación) | Criterios de corrección |
+
+---
+
+### Solución ejercicio 0
+
+Tras `python main.py`:
+
+| Pregunta | Respuesta |
+| --- | --- |
+| ¿Cuántos animales crea la demo? | **Tres:** un `Perro` (Rex), un `Gato` (Misi) y un `Loro` (Kiko). |
+| ¿Qué ocurre si vacunas al perro dos veces? | La primera llamada imprime que ha sido vacunado. La segunda lanza **`ValueError`** con un mensaje del estilo `Rex ya está vacunado.` La demo lo captura y muestra el error sin cortar el script. |
+| ¿Qué mensaje sale al instanciar `Animal`? | **`TypeError`**: no se puede instanciar la clase abstracta `Animal` sin implementar `hacer_sonido` y `tipo_alimentacion`. |
+
+Detalle útil: `vacunado` pasa a `True` tras la primera vacunación y no se puede asignar desde fuera (`AttributeError` si intentas `perro.vacunado = False`).
+
+---
+
+### Solución ejercicio 1
+
+**1) Peso total inicial**
+
+```text
+16.5
+```
+
+(`12.0 + 4.5`)
+
+**2) Tras `animales[0]["peso"] = -10`**
+
+```text
+-5.5
+```
+
+El diccionario **acepta** el peso negativo. El dominio queda corrupto y
+`total_peso` no se entera: solo suma lo que hay. En POO, el setter de
+`peso` habría lanzado `ValueError` y el valor anterior se conservaría.
+
+**3) Loro en la lista sin tocar `hacer_sonido`**
+
+Si añades algo como
+`{"tipo": "loro", "nombre": "Kiko", "frase": ""}` y llamas a
+`hacer_sonido` **sin** haber añadido la rama del loro, ocurre una de
+estas dos cosas según el código que uses:
+
+- Con la función del tutorial (que ya contempla `"loro"`): funciona.
+- Si quitas esa rama o usas solo perro/gato: lanzas
+  `ValueError("Tipo de animal desconocido.")`.
+
+La lección: cada especie nueva obliga a **reabrir** la función. En POO
+creas `Loro` y `emitir_sonido` no cambia.
+
+**Pregunta de reflexión — ¿dónde poner “peso > 0”?**
+
+En el enfoque con clases: en el **setter** de la propiedad `peso` (que
+llama a `validar_positivo`). Así nadie puede saltarse la regla al
+asignar. En el enfoque con `dict` tendrías que validar en *cada*
+función que escriba la clave `"peso"`, y aun así alguien podría hacer
+`animal["peso"] = -1` directamente.
+
+---
+
+### Solución ejercicio 2
+
+```python
+from src.modelos.animal import Animal
+from src.modelos.perro import Perro
+
+try:
+    Animal("Fantasma", 1)
+except TypeError as e:
+    print("Abstracción:", e)
+# TypeError: Can't instantiate abstract class Animal...
+# (menciona hacer_sonido y tipo_alimentacion)
+
+rex = Perro("Rex", 5, 12.0, "marrón")
+print(rex.info_basica())
+# Rex es un Perro de 5 años.
+
+print(isinstance(rex, Animal))
+# True
+```
+
+| Observación | Explicación |
+| --- | --- |
+| `TypeError` | `Animal` es abstracta (`ABC` + `@abstractmethod`). |
+| `info_basica()` | Método **concreto** heredado; no hace falta reimplementarlo en `Perro`. |
+| `isinstance(..., Animal)` | `True` por herencia: todo `Perro` *es un* `Animal`. |
+
+Comparación con `dict`: un diccionario incompleto se crea igual; no hay
+mecanismo nativo que diga “falta el sonido”.
+
+---
+
+### Solución ejercicio 3
+
+Salidas esperadas (nombres del ejercicio):
+
+```text
+Rex dice: ¡Guau!
+Misi dice: ¡Miau!
+Kiko dice: ¡Aaah!
+Kiko aprendió: Hola.
+Kiko dice: Hola
+omnívoro
+carnívoro
+granívoro
+```
+
+**Energía tras `perro.jugar()`**
+
+- Energía inicial: **80**
+- Coste de jugar (`Perro.COSTO_ENERGIA_JUGAR`): **20**
+- Resultado: **60**
+
+```python
+print(perro.energia)  # 60 después de jugar
+```
+
+Si la energía fuera menor que 20, `jugar()` lanzaría `ValueError` y no
+cambiaría el estado.
+
+---
+
+### Solución ejercicio 4
+
+| Paso | Resultado |
+| --- | --- |
+| `rex.peso` inicial | `12.0` |
+| `rex.peso = 13.5` | Aceptado; getter devuelve `13.5` |
+| `rex.peso = -1` | `ValueError: 'peso' debe ser mayor que cero.` |
+| Peso tras el error | Sigue en **`13.5`** (el estado no se corrompe) |
+| `rex.__peso` | `AttributeError` (name mangling; el nombre interno es `_Perro__peso`) |
+| Segunda asignación a `vacunado` | Tras `vacunar()`, `rex.vacunado = False` → `AttributeError` (propiedad de solo lectura) |
+
+Comparación con `dict`: `animal["peso"] = -1` y
+`animal["vacunado"] = False` “funcionan” y dejan datos incoherentes.
+
+---
+
+### Solución ejercicio 5
+
+Con la lista mixta del ejercicio, `emitir_sonido` imprime (orden
+Rex / Misi / Kiko):
+
+```text
+Rex dice: ¡Guau! | omnívoro
+Misi dice: ¡Miau! | carnívoro
+Kiko dice: ¡Aaah! | granívoro
+```
+
+`listar_info` devuelve tres cadenas del estilo:
+
+```text
+Rex es un Perro de 5 años.
+Misi es un Gato de 3 años.
+Kiko es un Loro de 4 años.
+```
+
+`total_peso` inicial: **16.9** (`12.0 + 4.5 + 0.4`).
+
+`animales_mayores_de(..., 4)`: nombres **`['Rex', 'Kiko']`**
+(edades 5 y 4; Misi tiene 3).
+
+Tras `alimentar(a, 100)` cada uno:
+
+- El peso sube `0.1` kg por animal.
+- La energía sube según la especie (+15 perro, +10 gato, +12 loro),
+  sin pasar de 100.
+- `total_peso` pasa a **17.2**.
+
+**Observación clave:** no hay `if isinstance`. Si mañana existe
+`Caballo` con `hacer_sonido` y `comer`, el mismo bucle sigue válido.
+
+---
+
+### Solución ejercicio 6
+
+| Archivo | Respuesta (una frase) |
+| --- | --- |
+| `animal.py` | `hacer_sonido` y `tipo_alimentacion` son abstractos para forzar a cada especie a definir su sonido y su dieta; sin ellos la clase no se puede instanciar. |
+| `perro.py` | La segunda `vacunar()` lanza `ValueError` porque `__vacunado` ya es `True`; el estado no vuelve atrás. |
+| `gato.py` | `ronronear()` **no** consume energía: solo exige un mínimo (20) para estar “a gusto”; si falta energía, lanza `ValueError`. |
+| `loro.py` | Solo el método `aprender(frase)` puede cambiar `__frase`; la propiedad `frase` es de solo lectura. |
+| `gestion_animales.py` | Un `str` es iterable carácter a carácter; si se aceptara, el bucle trataría cada letra como un “animal”. Por eso `_como_lista` lo rechaza. |
+| `validadores.py` | `bool` es subclase de `int` (`True == 1`); si no se excluyera, `True` pasaría como número válido y corrompería el dominio. |
+
+---
+
+### Solución ejercicio 7
+
+Código correcto (ya sugerido en la unidad; aquí con comprobaciones
+explícitas):
+
+```python
+from src.modelos.gato import Gato
+
+misi = Gato("Misi", 3, 4.5, "blanco", energia=10)
+
+try:
+    misi.cazar()
+    raise AssertionError("Debía fallar por energía insuficiente")
+except ValueError as error:
+    print(error)
+    # Energía insuficiente para cazar. Se necesitan 25 y hay 10.
+
+assert misi.presas_cazadas == 0
+assert misi.energia == 10          # no cambió
+
+misi.dormir()                      # +40 → energía 50
+assert misi.energia == 50
+
+print(misi.cazar())                # gasta 25 → energía 25; 1 presa
+assert misi.presas_cazadas == 1
+assert misi.energia == 25
+```
+
+| Momento | `energia` | `presas_cazadas` |
+| --- | --- | --- |
+| Tras fallar `cazar` | 10 | 0 |
+| Tras `dormir` | 50 | 0 |
+| Tras `cazar` con éxito | 25 | 1 |
+
+---
+
+### Solución ejercicio 8
+
+No hay una única implementación correcta; sí hay un **contrato mínimo**.
+Ejemplo de diseño coherente con el repositorio:
+
+| Pregunta | Ejemplo de respuesta válida |
+| --- | --- |
+| 1. `hacer_sonido()` | `return self.relinchar()` → `"{nombre} dice: ¡Hiii!"` |
+| 2. `tipo_alimentacion()` | `"herbívoro"` |
+| 3. Método propio | `galopar()` resta 35 de energía; falla con `ValueError` si hay menos de 35 |
+| 4. `comer(gramos)` | Sí, para que `alimentar()` funcione; p. ej. recupera **18** de energía (constante `RECUPERACION_COMIDA`) |
+| 5. Solo lectura | `carreras_ganadas` (int, empieza en 0); solo aumenta dentro de un método como `ganar_carrera()` |
+
+Esqueleto mínimo (orientativo):
+
+```python
+from src.modelos.animal import Animal
+from src.utils.validadores import validar_positivo, validar_rango
+
+
+class Caballo(Animal):
+    ENERGIA_MINIMA = 0
+    ENERGIA_MAXIMA = 100
+    COSTO_ENERGIA_GALOPAR = 35
+    RECUPERACION_COMIDA = 18
+
+    def __init__(self, nombre, edad, peso, color, energia=100):
+        super().__init__(nombre, edad)
+        self.__carreras_ganadas = 0
+        self.peso = peso
+        self.color = color
+        self.energia = energia
+
+    # properties peso / color / energia (igual patrón que Loro)...
+
+    @property
+    def carreras_ganadas(self) -> int:
+        return self.__carreras_ganadas
+
+    def hacer_sonido(self) -> str:
+        return self.relinchar()
+
+    def tipo_alimentacion(self) -> str:
+        return "herbívoro"
+
+    def relinchar(self) -> str:
+        return f"{self.nombre} dice: ¡Hiii!"
+
+    def galopar(self) -> str:
+        if self.energia < self.COSTO_ENERGIA_GALOPAR:
+            raise ValueError("Energía insuficiente para galopar.")
+        self.energia -= self.COSTO_ENERGIA_GALOPAR
+        return f"{self.nombre} galopa. Energía: {self.energia}."
+
+    def comer(self, gramos: float) -> str:
+        validar_positivo(gramos, "gramos")
+        self.peso = self.peso + (gramos / 1000)
+        self.energia = min(
+            self.ENERGIA_MAXIMA,
+            self.energia + self.RECUPERACION_COMIDA,
+        )
+        return f"{self.nombre} come {gramos} g."
+```
+
+**Qué no se toca:** `src/modelos/animal.py` (salvo atributos comunes a
+todas las especies) y `src/servicios/gestion_animales.py`.
+
+**Qué sí:** `caballo.py`, export en `__init__.py`, `tests/test_caballo.py`,
+línea en la demo y documentación (README / casos de uso).
+
+Guía paso a paso completa:
+[manual, sección 7](manual_desarrollador.md#7-cómo-añadir-una-especie).
+
+---
+
+### Solución del mini-reto final
+
+**Respuesta modelo** (puedes variar el estilo; deben aparecer al menos
+dos pilares):
+
+> En este dominio cada animal tiene reglas (peso positivo, energía 0–100)
+> y acciones distintas (jugar, cazar, volar). Con diccionarios las reglas
+> se dispersan y cualquiera puede escribir `peso = -1`. Con
+> **encapsulamiento**, las propiedades validan y datos como `vacunado` o
+> `frase` solo cambian con el método adecuado. Con **polimorfismo**,
+> `emitir_sonido` y `alimentar` no necesitan `if` por tipo: cada clase
+> implementa `hacer_sonido` y `comer`. La **abstracción** (`Animal` +
+> `ABC`) impide crear un animal incompleto, y la **herencia** reutiliza
+> nombre, edad e `info_basica`. Por eso las clases encajan mejor aquí que
+> una lista de `dict`.
+
+Criterios de corrección rápida:
+
+- Menciona ≥ 2 pilares con sentido en el dominio.
+- Contrasta al menos un riesgo del `dict` (validación, `if` por tipo o
+  estado ilegal).
+- No supera ~10 líneas.
+
+---
+
+### Solución orientativa de la autoevaluación
+
+| Ítem | Cómo comprobar que lo dominas |
+| --- | --- |
+| Por qué `Animal(...)` lanza `TypeError` | Porque faltan implementaciones de los abstractos; ver unidad 2. |
+| Crear las tres especies | `Perro(...)`, `Gato(...)`, `Loro(...)` con datos válidos. |
+| `ValueError` de un setter | p. ej. `perro.peso = -1` y comprobar que el peso no cambia. |
+| Lista mixta + servicios | Unidad 5 / solución del ejercicio 5. |
+| Archivos que no se tocan al añadir especie | `animal.py` (salvo lo común) y `gestion_animales.py`. |
+| Contraste `comer` / peso negativo | Ejercicio 1 (dict acepta) vs ejercicio 4 (clase rechaza). |
+| Demo y tests | `python main.py` y `python -m unittest discover -s tests -v` en verde. |
 
 ---
 
