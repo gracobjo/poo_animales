@@ -16,6 +16,7 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 
 | Si quieres… | Abre |
 | --- | --- |
+| Entender el proceso completo (análisis → pruebas) | [Documentación técnica y pedagógica](docs/documentacion_tecnica_pedagogica.md) |
 | Aprender POO con ejercicios (curso) | [Tutorial de especialización](docs/tutorial_especializacion.md) |
 | Ver las soluciones de los ejercicios | [Tutorial → Solucionario completo](docs/tutorial_especializacion.md#solucionario-completo) |
 | Comparar clases frente a `dict` | [Tutorial, unidades 1 y 5](docs/tutorial_especializacion.md#unidad-1-el-mismo-problema-primero-con-diccionarios) |
@@ -30,12 +31,14 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 
 | Documento | Ruta | Público | Contenido |
 | --- | --- | --- | --- |
+| [Documentación técnica y pedagógica](docs/documentacion_tecnica_pedagogica.md) | `docs/documentacion_tecnica_pedagogica.md` | Alumnado / docencia | Proceso completo: requisitos, dominio, diseño, etapas de código, pruebas, pilares y checklist |
 | [Tutorial de especialización](docs/tutorial_especializacion.md) | `docs/tutorial_especializacion.md` | Alumnado / curso | 10 unidades, ejemplos guiados, POO vs `dict`, autoevaluación y [solucionario completo](docs/tutorial_especializacion.md#solucionario-completo) |
 | [Casos de uso](docs/casos_de_uso.md) | `docs/casos_de_uso.md` | Análisis / producto | CU-01 a CU-19: flujos, errores y postcondiciones |
 | [Manual de desarrollador](docs/manual_desarrollador.md) | `docs/manual_desarrollador.md` | Desarrolladores | Estructura, API, errores, pruebas, cómo extender |
 
 En GitHub también puedes abrirlos desde el repositorio:
 
+- [Documentación técnica y pedagógica](https://github.com/gracobjo/poo_animales/blob/main/docs/documentacion_tecnica_pedagogica.md)
 - [Tutorial](https://github.com/gracobjo/poo_animales/blob/main/docs/tutorial_especializacion.md)
 - [Casos de uso](https://github.com/gracobjo/poo_animales/blob/main/docs/casos_de_uso.md)
 - [Manual](https://github.com/gracobjo/poo_animales/blob/main/docs/manual_desarrollador.md)
@@ -70,6 +73,7 @@ animales_poo/
 ├── README.md
 ├── .gitignore
 ├── docs/
+│   ├── documentacion_tecnica_pedagogica.md
 │   ├── casos_de_uso.md
 │   ├── manual_desarrollador.md
 │   └── tutorial_especializacion.md
