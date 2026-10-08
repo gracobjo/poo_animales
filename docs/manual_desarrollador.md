@@ -16,7 +16,100 @@ Comprobar la versión:
 python --version
 ```
 
-## 2. Puesta en marcha
+## 2. Crear las carpetas por primera vez
+
+Si el proyecto todavía no existe, este script de PowerShell crea cada archivo y, si hace falta, la carpeta que lo contiene. No hay que crear `src`, `tests` ni `ejemplos` a mano.
+
+Ejecútalo en la carpeta padre de `animales_poo`. Por ejemplo, en `Documentos\proyectosMios` si el proyecto debe quedar en `Documentos\proyectosMios\animales_poo`. `New-Item -Force` sobre un archivo que ya existe lo deja vacío: úsalo solo para montar la estructura la primera vez.
+
+```powershell
+function Crear-Archivo($ruta) {
+    $carpeta = Split-Path $ruta -Parent
+    if (-not (Test-Path $carpeta)) {
+        New-Item -ItemType Directory -Force -Path $carpeta | Out-Null
+    }
+    New-Item -ItemType File -Force -Path $ruta | Out-Null
+}
+
+# Ahora puedes crear archivos sin preocuparte por las carpetas
+Crear-Archivo "animales_poo\src\modelos\animal.py"
+Crear-Archivo "animales_poo\src\modelos\perro.py"
+Crear-Archivo "animales_poo\src\modelos\gato.py"
+Crear-Archivo "animales_poo\src\modelos\loro.py"
+Crear-Archivo "animales_poo\src\servicios\gestion_animales.py"
+Crear-Archivo "animales_poo\src\utils\validadores.py"
+Crear-Archivo "animales_poo\tests\test_perro.py"
+Crear-Archivo "animales_poo\tests\test_gato.py"
+Crear-Archivo "animales_poo\tests\test_loro.py"
+Crear-Archivo "animales_poo\ejemplos\demo_completa.py"
+Crear-Archivo "animales_poo\src\__init__.py"
+Crear-Archivo "animales_poo\src\modelos\__init__.py"
+Crear-Archivo "animales_poo\src\servicios\__init__.py"
+Crear-Archivo "animales_poo\src\utils\__init__.py"
+Crear-Archivo "animales_poo\tests\__init__.py"
+Crear-Archivo "animales_poo\ejemplos\__init__.py"
+Crear-Archivo "animales_poo\main.py"
+Crear-Archivo "animales_poo\README.md"
+
+Write-Host "✅ Todo creado correctamente" -ForegroundColor Green
+```
+
+Este repositorio añade también la documentación y el archivo que Git ignora. Las mismas llamadas los crean:
+
+```powershell
+Crear-Archivo "animales_poo\docs\casos_de_uso.md"
+Crear-Archivo "animales_poo\docs\manual_desarrollador.md"
+Crear-Archivo "animales_poo\.gitignore"
+```
+
+### Comprobar la estructura
+
+Después de ejecutar el script, y cuando aparezca el mensaje verde, verifica que las carpetas y los archivos existen. Sigue en la misma carpeta padre desde la que lanzaste el script:
+
+```powershell
+cd animales_poo
+tree /F
+```
+
+`cd` entra en el proyecto. `tree /F` dibuja el árbol e incluye los archivos, no solo las carpetas. La salida debe coincidir con esta estructura (el orden de las ramas puede variar):
+
+```text
+animales_poo
+├── main.py
+├── README.md
+├── .gitignore
+├── docs
+│   ├── casos_de_uso.md
+│   └── manual_desarrollador.md
+├── ejemplos
+│   ├── __init__.py
+│   └── demo_completa.py
+├── src
+│   ├── __init__.py
+│   ├── modelos
+│   │   ├── __init__.py
+│   │   ├── animal.py
+│   │   ├── perro.py
+│   │   ├── gato.py
+│   │   └── loro.py
+│   ├── servicios
+│   │   ├── __init__.py
+│   │   └── gestion_animales.py
+│   └── utils
+│       ├── __init__.py
+│       └── validadores.py
+└── tests
+    ├── __init__.py
+    ├── test_perro.py
+    ├── test_gato.py
+    └── test_loro.py
+```
+
+Si falta una rama, vuelve a la carpeta padre (`cd ..`) y repite solo la llamada `Crear-Archivo` de esa ruta. Los archivos quedan vacíos: el código se escribe después, en cada uno.
+
+Quien ya tiene el repositorio clonado no necesita este paso: `git clone` trae carpetas y contenido. Para revisar un clon, el mismo `tree /F` sirve desde la raíz del proyecto.
+
+## 3. Puesta en marcha
 
 ```bash
 git clone https://github.com/gracobjo/poo_animales.git
@@ -34,7 +127,7 @@ python tests/test_perro.py
 python tests/test_gato.py
 ```
 
-## 3. Arquitectura
+## 4. Arquitectura
 
 El código separa tres responsabilidades:
 
@@ -100,19 +193,31 @@ classDiagram
         +comer(gramos) str
         +dormir() str
     }
+    class Loro {
+        +peso: float
+        +color: str
+        +energia: float
+        +frase: str
+        +hablar() str
+        +aprender(frase) str
+        +volar() str
+        +comer(gramos) str
+    }
     Animal <|-- Perro
     Animal <|-- Gato
+    Animal <|-- Loro
 ```
 
-`Animal` hereda de `ABC`. El nombre es un atributo público. La edad se guarda en `_edad` y solo debe leerse o escribirse con la propiedad `edad`. En `Perro` y `Gato`, el doble guion bajo activa el *name mangling* de Python: fuera de la clase, `__peso` no existe.
+`Animal` hereda de `ABC`. El nombre es un atributo público. La edad se guarda en `_edad` y solo debe leerse o escribirse con la propiedad `edad`. En `Perro`, `Gato` y `Loro`, el doble guion bajo activa el *name mangling* de Python: fuera de la clase, `__peso` no existe.
 
-## 4. API pública
+## 5. API pública
 
 Importar desde los submódulos, que es la forma usada por la demo y las pruebas:
 
 ```python
 from src.modelos.animal import Animal
 from src.modelos.gato import Gato
+from src.modelos.loro import Loro
 from src.modelos.perro import Perro
 from src.servicios.gestion_animales import (
     alimentar,
@@ -176,6 +281,25 @@ Constructor: `Gato(nombre, edad, peso, color, energia=100)`.
 
 Constantes: `COSTO_ENERGIA_CAZAR` (25), `RECUPERACION_DORMIR` (40), `RECUPERACION_COMIDA` (10), `ENERGIA_MINIMA_RONRONEO` (20), más los límites de energía.
 
+### Loro
+
+Constructor: `Loro(nombre, edad, peso, color, energia=100)`.
+
+El ejemplo completo de cómo se añadió esta clase está en la sección 7.
+
+| Miembro | Contrato |
+| --- | --- |
+| `peso`, `color`, `energia` | Las mismas reglas que en `Perro`. |
+| `frase` | `str` de solo lectura. Empieza vacía. |
+| `hacer_sonido()` | Igual que `hablar()`. |
+| `tipo_alimentacion()` | `"granívoro"`. |
+| `hablar()` | Repite `frase`, o `"{nombre} dice: ¡Aaah!"` si está vacía. |
+| `aprender(frase)` | Guarda un texto no vacío, ya recortado. |
+| `volar()` | Resta 30. Falla si hay menos de 30. |
+| `comer(gramos)` | `+gramos/1000` kg y `+12` de energía, tope 100. |
+
+Constantes: `COSTO_ENERGIA_VOLAR` (30), `RECUPERACION_COMIDA` (12), más los límites de energía.
+
 ### Servicios
 
 Todas las funciones aceptan cualquier subclase de `Animal`. No comprueban el tipo con `isinstance` para decidir el sonido o la comida: llaman al método y se ejecuta la versión de la clase real.
@@ -198,40 +322,201 @@ Todas las funciones aceptan cualquier subclase de `Animal`. No comprueban el tip
 
 Los mensajes incluyen el `nombre_campo` entre comillas simples, por ejemplo `'peso' debe ser mayor que cero.`
 
-## 5. Errores
+## 6. Errores
 
 | Situación | Excepción |
 | --- | --- |
 | Dato de dominio inválido | `ValueError` |
 | Instanciar `Animal` | `TypeError` |
-| Escribir `vacunado` o `presas_cazadas` | `AttributeError` |
+| Escribir `vacunado`, `presas_cazadas` o `frase` | `AttributeError` |
 | Leer `__peso` desde fuera de la clase | `AttributeError` |
 
-Los métodos que pueden fallar (`comer`, `jugar`, `cazar`, `ronronear`, `vacunar` y los setters) validan antes de modificar el estado. Un `ValueError` deja el objeto como estaba.
+Los métodos que pueden fallar (`comer`, `jugar`, `cazar`, `ronronear`, `vacunar`, `volar`, `aprender` y los setters) validan antes de modificar el estado. Un `ValueError` deja el objeto como estaba.
 
 `alimentar` deja pasar el `ValueError` de `comer`. Si el objeto no tiene `comer`, lanza su propio `ValueError`.
 
-## 6. Cómo añadir una especie
+## 7. Cómo añadir una especie
 
-Ejemplo: incorporar un `Loro` sin romper los servicios existentes.
+Esta sección explica, con el loro como ejemplo real, cómo incorporar un animal nuevo sin romper el resto del proyecto. El código completo está en `src/modelos/loro.py`. Los mismos pasos valen para cualquier otra especie (un caballo, un pez, etc.).
 
-1. Crear `src/modelos/loro.py` con `class Loro(Animal)`.
-2. Llamar a `super().__init__(nombre, edad)` antes de asignar el estado propio.
-3. Implementar `hacer_sonido()` y `tipo_alimentacion()`. Sin esos dos métodos la clase sigue siendo abstracta y no se puede instanciar.
-4. Si el loro come, implementar `comer(gramos)` con la misma idea que perro y gato: validar, después modificar. `alimentar()` lo encontrará por duck typing y no hará falta tocarlo.
-5. Exponer el estado nuevo con `@property`. Usar `__` solo para datos que no deben leerse desde fuera. Usar `validar_positivo` o `validar_rango` en el setter.
-6. Añadir el export en `src/modelos/__init__.py`.
-7. Crear `tests/test_loro.py` con un `setUp` que construya un loro nuevo en cada test. Cubrir el sonido, un comportamiento propio, un setter válido y un setter que deba fallar sin cambiar el valor anterior.
-8. Añadir un loro a la lista de `ejemplos/demo_completa.py` y comprobar que `emitir_sonido`, `listar_info` y `total_peso` lo aceptan.
-9. Documentar las reglas nuevas en el README y, si cambia lo que el cuidador puede hacer, en `docs/casos_de_uso.md`.
+**Idea clave:** un animal nuevo es una subclase de `Animal`. No se toca `Animal` ni `gestion_animales.py`. Los servicios ya trabajan con cualquier objeto que cumpla el contrato (métodos abstractos +, si come, el método `comer`).
 
-No hace falta modificar `Animal` para una especie nueva, salvo que el dato sea común a todos los animales.
+### Paso 1. Crear el archivo y la clase
 
-## 7. Pruebas
+Crea `src/modelos/loro.py`. La clase hereda de `Animal` y declara las constantes que usarán sus métodos:
 
-Hay 56 pruebas con `unittest`. Cada método de test comprueba una sola situación. `setUp` crea el animal, así que las pruebas no comparten estado.
+```python
+from src.modelos.animal import Animal
+from src.utils.validadores import validar_positivo, validar_rango
 
-Al cambiar una constante de energía, los tests de perro y gato leen `Perro.COSTO_ENERGIA_JUGAR`, `Gato.RECUPERACION_COMIDA` y el resto de constantes. No hace falta reescribir el número esperado si solo cambia la constante y el test expresa el resultado a partir de ella.
+
+class Loro(Animal):
+    ENERGIA_MINIMA = 0
+    ENERGIA_MAXIMA = 100
+    COSTO_ENERGIA_VOLAR = 30
+    RECUPERACION_COMIDA = 12
+```
+
+Las constantes evitan números mágicos. Si mañana volar cuesta 25 en lugar de 30, se cambia un solo sitio y los tests que leen `Loro.COSTO_ENERGIA_VOLAR` siguen siendo correctos.
+
+### Paso 2. El constructor: primero la base, después lo propio
+
+```python
+def __init__(self, nombre, edad, peso, color, energia=100):
+    super().__init__(nombre, edad)   # valida nombre y edad
+    self.__frase = ""                # estado solo del loro
+    self.peso = peso                 # pasa por el setter
+    self.color = color
+    self.energia = energia
+```
+
+`super().__init__(nombre, edad)` va **antes** de asignar el resto. Así `Animal` valida el nombre (texto no vacío) y la edad (0–30). Si fallan, el loro ni llega a crearse.
+
+El peso, el color y la energía se asignan con `self.peso = ...`, no con `self.__peso = ...`. Al usar la propiedad, el setter valida. Un peso negativo lanza `ValueError` y el objeto no queda a medias con datos inválidos.
+
+`__frase` empieza vacía: el loro aún no ha aprendido nada. El doble guion bajo activa el *name mangling*; desde fuera no existe `loro.__frase`.
+
+### Paso 3. Cumplir el contrato abstracto (obligatorio)
+
+`Animal` declara dos métodos abstractos. Sin implementarlos, `Loro(...)` lanza `TypeError` igual que `Animal(...)`.
+
+```python
+def hacer_sonido(self) -> str:
+    return self.hablar()
+
+def tipo_alimentacion(self) -> str:
+    return "granívoro"
+```
+
+`hacer_sonido()` suele delegar en el método natural de la especie (`hablar`, `ladrar`, `maullar`). Así `emitir_sonido(loro)` y `loro.hablar()` dicen lo mismo.
+
+Con esto ya tienes un `Animal` concreto. `info_basica()` se hereda gratis: `Kiko es un Loro de 4 años.`
+
+### Paso 4. Encapsular el estado con propiedades
+
+Repite el patrón de perro y gato para `peso`, `color` y `energia`:
+
+- Getter: lee `__peso`, `__color` o `__energia`.
+- Setter: llama a `validar_positivo` o `validar_rango` y solo entonces guarda.
+
+Para datos que **solo** deben cambiar con un método (la frase del loro, la vacunación del perro, las presas del gato), usa una propiedad **sin setter**:
+
+```python
+@property
+def frase(self) -> str:
+    return self.__frase
+# No hay @frase.setter → loro.frase = "Otra" lanza AttributeError
+```
+
+### Paso 5. Comportamiento propio de la especie
+
+Aquí va lo que distingue al loro:
+
+| Método | Qué hace | Si falla |
+| --- | --- | --- |
+| `hablar()` | Repite `frase`, o grazna `¡Aaah!` si está vacía | No falla |
+| `aprender(frase)` | Guarda un texto no vacío en `__frase` | `ValueError`; la frase anterior se conserva |
+| `volar()` | Resta 30 de energía | `ValueError` si hay menos de 30; la energía no cambia |
+| `comer(gramos)` | Suma `gramos/1000` kg y recupera 12 de energía | `ValueError` si los gramos no son positivos |
+
+Regla de seguridad: **validar antes de modificar**. Si `volar` comprueba la energía y falla, no resta nada. Lo mismo con `aprender` y `comer`.
+
+`comer` es especial: no es abstracto, pero si lo implementas, `alimentar(loro, 100)` funciona sola. El servicio busca un método llamado `comer` (duck typing) y no pregunta si el objeto es un loro. **No hace falta tocar** `src/servicios/gestion_animales.py`.
+
+### Paso 6. Representación legible
+
+Implementa `__str__` para la demo y las pruebas. Incluye nombre, edad, peso, color, energía y el dato propio (la frase, o `ninguna` si está vacía).
+
+### Paso 7. Exportar la clase
+
+En `src/modelos/__init__.py`:
+
+```python
+from src.modelos.loro import Loro
+
+__all__ = ["Animal", "Perro", "Gato", "Loro"]
+```
+
+Sin esto, `from src.modelos import Loro` no funciona. Los imports directos (`from src.modelos.loro import Loro`) sí, pero conviene mantener el paquete coherente.
+
+### Paso 8. Escribir pruebas
+
+Crea `tests/test_loro.py` con `unittest`. En `setUp`, construye un loro nuevo para que cada test sea independiente.
+
+Cubre al menos:
+
+1. Que es instancia de `Animal`.
+2. El sonido (`hablar` / `hacer_sonido`) y `tipo_alimentacion`.
+3. Un comportamiento propio con éxito (`aprender`, `volar`).
+4. El mismo comportamiento cuando debe fallar **y** el estado no cambia.
+5. Un setter inválido (por ejemplo `peso = -1`) que conserva el valor anterior.
+6. Que `frase` es de solo lectura (`AttributeError` al asignar).
+
+Ejemplo del patrón de fallo sin cambiar estado:
+
+```python
+def test_volar_sin_energia_no_cambia_el_estado(self) -> None:
+    cansado = Loro("Luna", 1, 0.3, "azul", energia=10)
+    with self.assertRaises(ValueError):
+        cansado.volar()
+    self.assertEqual(cansado.energia, 10)
+```
+
+Ejecutar:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+### Paso 9. Meterlo en la demo
+
+En `ejemplos/demo_completa.py`:
+
+1. Importa `Loro`.
+2. Créalo junto al perro y al gato.
+3. Llama a sus métodos propios (`aprender`, `volar`, `comer`).
+4. Añádelo a la lista `animales = [perro, gato, loro]`.
+
+`emitir_sonido`, `listar_info`, `alimentar` y `total_peso` lo aceptan **sin ramas nuevas**. Ese es el polimorfismo: la misma función, distinta clase real.
+
+### Paso 10. Documentar
+
+- **README:** añade la especie en herencia, encapsulamiento, estructura de carpetas, ejemplo de uso y tabla de reglas.
+- **Casos de uso:** registra qué puede hacer el cuidador (en el loro: CU-17 registrar, CU-18 enseñar frase, CU-19 volar).
+- **Manual:** la API de la clase (sección 5) y esta guía.
+
+### Qué no hay que tocar
+
+| Archivo | ¿Se modifica? | Por qué |
+| --- | --- | --- |
+| `src/modelos/animal.py` | No | El contrato ya es genérico |
+| `src/servicios/gestion_animales.py` | No | Usa duck typing / polimorfismo |
+| `src/utils/validadores.py` | No | Las validaciones ya existen |
+| `src/modelos/loro.py` | Sí | La clase nueva |
+| `src/modelos/__init__.py` | Sí | Export |
+| `tests/test_loro.py` | Sí | Pruebas |
+| `ejemplos/demo_completa.py` | Sí | Demostración |
+| README y docs | Sí | Documentación |
+
+Solo tocarías `Animal` si el dato nuevo fuera común a **todas** las especies (por ejemplo, un identificador de microchip para todos).
+
+### Checklist rápido
+
+- [ ] Archivo `src/modelos/<especie>.py` con `class X(Animal)`
+- [ ] `super().__init__(nombre, edad)` al inicio del constructor
+- [ ] `hacer_sonido()` y `tipo_alimentacion()` implementados
+- [ ] Propiedades con validación; datos sensibles de solo lectura
+- [ ] `comer(gramos)` si debe poder alimentarse con el servicio
+- [ ] Export en `__init__.py`
+- [ ] Tests independientes (éxito + fallo sin mutar estado)
+- [ ] Demo y documentación actualizadas
+- [ ] `python -m unittest discover -s tests -v` en verde
+
+## 8. Pruebas
+
+Hay 70 pruebas con `unittest`. Cada método de test comprueba una sola situación. `setUp` crea el animal, así que las pruebas no comparten estado.
+
+Al cambiar una constante de energía, los tests leen `Perro.COSTO_ENERGIA_JUGAR`, `Gato.RECUPERACION_COMIDA`, `Loro.COSTO_ENERGIA_VOLAR` y el resto de constantes. No hace falta reescribir el número esperado si solo cambia la constante y el test expresa el resultado a partir de ella.
 
 Convención para un test nuevo:
 
@@ -245,7 +530,7 @@ def test_jugar_sin_energia_no_cambia_el_estado(self) -> None:
 
 El nombre dice la acción y el resultado. Si el método puede fallar, el test comprueba también que el objeto no quedó a medias.
 
-## 8. Convenciones
+## 9. Convenciones
 
 - Python 3.8: las anotaciones usan `List` y `Sequence` de `typing`, no `list[Animal]`, porque esa forma falla al evaluarse en 3.8.
 - Docstrings en las clases y en los métodos públicos, en español, con `Args`, `Returns` y `Raises` cuando aportan algo.
@@ -255,24 +540,25 @@ El nombre dice la acción y el resultado. Si el método puede fallar, el test co
 - Los comentarios explican una decisión (por qué el setter valida, por qué `__peso` no se ve desde fuera), no repiten el nombre del método.
 - No capturar un `ValueError` para volver a lanzarlo sin añadir información. En la demo sí se captura, porque el objetivo es mostrar el mensaje y seguir.
 
-## 9. Recorrido de una llamada polimórfica
+## 10. Recorrido de una llamada polimórfica
 
-Cuando la demo ejecuta `emitir_sonido(animal)` dentro de un bucle con un perro y un gato:
+Cuando la demo ejecuta `emitir_sonido(animal)` dentro de un bucle con un perro, un gato y un loro:
 
 1. `emitir_sonido` recibe el objeto anotado como `Animal`.
 2. Llama a `animal.hacer_sonido()`.
-3. Python busca el método en la clase real. En un `Perro` entra en `Perro.hacer_sonido`, que delega en `ladrar`. En un `Gato`, delega en `maullar`.
+3. Python busca el método en la clase real. En un `Perro` entra en `Perro.hacer_sonido`, que delega en `ladrar`. En un `Gato`, delega en `maullar`. En un `Loro`, delega en `hablar`.
 4. La función de servicio devuelve ese texto. No tiene ramas `if isinstance(animal, Perro)`.
 
-`alimentar` sigue el mismo esquema con `comer`. La diferencia de energía (+15 o +10) vive en la subclase, no en el servicio.
+`alimentar` sigue el mismo esquema con `comer`. La diferencia de energía (+15, +10 o +12) vive en la subclase, no en el servicio.
 
-## 10. Dónde cambiar cada cosa
+## 11. Dónde cambiar cada cosa
 
 | Si quieres… | Archivo |
 | --- | --- |
 | Cambiar el rango de edad | `src/modelos/animal.py` (`EDAD_MINIMA`, `EDAD_MAXIMA`) |
-| Cambiar el coste de jugar, cazar, dormir o comer | Constantes de `perro.py` o `gato.py` |
+| Cambiar el coste de jugar, cazar, volar, dormir o comer | Constantes de `perro.py`, `gato.py` o `loro.py` |
 | Cambiar el mensaje de un número inválido | `src/utils/validadores.py` |
 | Añadir una operación de grupo | `src/servicios/gestion_animales.py` |
 | Enseñar el proyecto | `ejemplos/demo_completa.py` y `main.py` |
+| Añadir una especie nueva | Sección 7 de este manual; ejemplo en `loro.py` |
 | Describir una acción del cuidador | `docs/casos_de_uso.md` |

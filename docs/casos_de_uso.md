@@ -48,7 +48,7 @@ flowchart LR
 | CU-01 | Registrar un perro | Existe un `Perro` sin vacunar |
 | CU-02 | Registrar un gato | Existe un `Gato` con cero presas |
 | CU-03 | Consultar la ficha | Texto con nombre, especie y edad |
-| CU-04 | Emitir el sonido | Ladrido o maullido según la clase real |
+| CU-04 | Emitir el sonido | Ladrido, maullido o frase según la clase real |
 | CU-05 | Alimentar | Sube el peso y recupera energía |
 | CU-06 | Jugar con un perro | Gasta 20 de energía |
 | CU-07 | Dejar descansar a un perro | Recupera 25 de energía, máximo 100 |
@@ -61,6 +61,9 @@ flowchart LR
 | CU-14 | Filtrar por edad | Animales con edad mayor o igual al mínimo |
 | CU-15 | Calcular el peso total | Suma de los kilogramos del grupo |
 | CU-16 | Impedir un animal genérico | `TypeError` al instanciar `Animal` |
+| CU-17 | Registrar un loro | Existe un `Loro` sin frase aprendida |
+| CU-18 | Enseñar una frase al loro | La repite al hablar |
+| CU-19 | Hacer volar a un loro | Gasta 30 de energía |
 
 ---
 
@@ -401,7 +404,7 @@ flowchart LR
 
 **Actor:** cuidador.
 
-**Descripción:** el sistema rechaza crear un `Animal` que no sea perro ni gato.
+**Descripción:** el sistema rechaza crear un `Animal` que no sea perro, gato o loro.
 
 **Precondiciones:** ninguna.
 
@@ -410,4 +413,72 @@ flowchart LR
 1. El cuidador llama a `Animal(nombre, edad)`.
 2. El sistema lanza `TypeError` porque `hacer_sonido` y `tipo_alimentacion` no tienen implementación.
 
-**Postcondición:** no existe una instancia de la clase abstracta. Para tener un animal hay que usar `Perro` o `Gato` (CU-01 o CU-02).
+**Postcondición:** no existe una instancia de la clase abstracta. Para tener un animal hay que usar `Perro`, `Gato` o `Loro` (CU-01, CU-02 o CU-17).
+
+---
+
+## CU-17. Registrar un loro
+
+**Actor:** cuidador.
+
+**Descripción:** crea un loro con nombre, edad, peso, color y, si se indica, energía inicial.
+
+**Precondiciones:** ninguna. El loro todavía no existe.
+
+**Flujo principal:**
+
+1. El cuidador llama a `Loro(nombre, edad, peso, color)` o añade `energia`.
+2. El sistema valida el nombre y la edad en `Animal`, igual que en el perro y el gato.
+3. El sistema valida peso, color y energía mediante las propiedades.
+4. La frase aprendida queda vacía.
+5. Si no se pasó energía, queda en 100.
+
+**Flujos alternativos:** los mismos rechazos del CU-01.
+
+**Postcondición:** hay una instancia de `Loro` y de `Animal`, sin frase aprendida. `hablar()` devuelve `{nombre} dice: ¡Aaah!`.
+
+---
+
+## CU-18. Enseñar una frase al loro
+
+**Actor:** cuidador.
+
+**Descripción:** el loro memoriza un texto y lo repite.
+
+**Precondiciones:** el loro existe.
+
+**Flujo principal:**
+
+1. El cuidador llama a `loro.aprender(frase)`.
+2. El sistema comprueba que la frase sea un texto no vacío y recorta los espacios.
+3. Guarda la frase. La propiedad `frase` permite leerla y no escribirla.
+4. `hablar()` y `hacer_sonido()` devuelven `{nombre} dice: {frase}`.
+
+**Flujos alternativos:**
+
+- Frase vacía o que no es texto: `ValueError`. La frase anterior se conserva.
+- El cuidador intenta `loro.frase = "Otra"`: `AttributeError`.
+
+**Postcondición:** la próxima vez que hable, repite la frase nueva.
+
+---
+
+## CU-19. Hacer volar a un loro
+
+**Actor:** cuidador.
+
+**Descripción:** el loro vuela y gasta energía.
+
+**Precondiciones:** el loro existe.
+
+**Flujo principal:**
+
+1. El cuidador llama a `loro.volar()`.
+2. El sistema comprueba que la energía sea al menos 30.
+3. Resta 30 y devuelve un mensaje con la energía restante.
+
+**Flujos alternativos:**
+
+- Energía menor que 30: `ValueError`. La energía no cambia.
+
+**Postcondición:** la energía es 30 puntos menor que antes.

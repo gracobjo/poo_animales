@@ -2,6 +2,7 @@
 
 from src.modelos.animal import Animal
 from src.modelos.gato import Gato
+from src.modelos.loro import Loro
 from src.modelos.perro import Perro
 from src.servicios.gestion_animales import (
     alimentar,
@@ -20,22 +21,25 @@ def _titulo(texto: str) -> None:
 
 
 def _crear_animales() -> tuple:
-    """Crea un perro y un gato con datos válidos.
+    """Crea un perro, un gato y un loro con datos válidos.
 
     Returns:
-        La pareja ``(perro, gato)`` lista para el resto de la demo.
+        La terna ``(perro, gato, loro)`` lista para el resto de la demo.
     """
-    _titulo("1. Herencia: crear un Perro y un Gato")
+    _titulo("1. Herencia: crear un Perro, un Gato y un Loro")
     perro = Perro("Rex", 5, 12.0, "marrón", energia=80)
     gato = Gato("Misi", 3, 4.5, "blanco", energia=70)
+    loro = Loro("Kiko", 4, 0.4, "verde", energia=50)
     print(perro)
     print(gato)
+    print(loro)
     print(perro.info_basica())
     print(gato.info_basica())
-    return perro, gato
+    print(loro.info_basica())
+    return perro, gato, loro
 
 
-def _mostrar_comportamiento(perro: Perro, gato: Gato) -> None:
+def _mostrar_comportamiento(perro: Perro, gato: Gato, loro: Loro) -> None:
     """Ejecuta los métodos propios de cada especie."""
     _titulo("2. Comportamiento específico de cada clase")
     print(perro.ladrar())
@@ -54,8 +58,14 @@ def _mostrar_comportamiento(perro: Perro, gato: Gato) -> None:
     print(gato.cazar())
     print(gato.dormir())
 
+    print(loro.hablar())
+    print(loro.aprender("Hola"))
+    print(loro.hablar())
+    print(loro.volar())
+    print(loro.comer(100))
 
-def _mostrar_encapsulamiento(perro: Perro, gato: Gato) -> None:
+
+def _mostrar_encapsulamiento(perro: Perro, gato: Gato, loro: Loro) -> None:
     """Muestra getters, setters y el bloqueo de los atributos privados."""
     _titulo("3. Encapsulamiento: propiedades y atributos privados")
     print(f"Peso de {perro.nombre} leído con el getter: {perro.peso} kg")
@@ -90,6 +100,11 @@ def _mostrar_encapsulamiento(perro: Perro, gato: Gato) -> None:
     except AttributeError as error:
         print(f"'presas_cazadas' es de solo lectura: {error}")
 
+    try:
+        loro.frase = "Otra frase"  # type: ignore[misc]
+    except AttributeError as error:
+        print(f"'frase' es de solo lectura: {error}")
+
 
 def _mostrar_abstraccion() -> None:
     """Intenta instanciar la clase abstracta para mostrar que no se puede."""
@@ -103,7 +118,7 @@ def _mostrar_abstraccion() -> None:
 
 
 def _mostrar_polimorfismo(animales: list) -> None:
-    """Recorre perros y gatos usando solo la interfaz de Animal."""
+    """Recorre cualquier Animal usando solo la interfaz común."""
     _titulo("5. Polimorfismo: la misma llamada, distinto resultado")
     for animal in animales:
         print(
@@ -122,6 +137,7 @@ def _usar_servicios(animales: list) -> None:
     print(f"Peso total del grupo: {total_peso(animales):.2f} kg")
     print(alimentar(animales[0], 500))
     print(alimentar(animales[1], 200))
+    print(alimentar(animales[2], 100))
     print(f"Peso total después de comer: {total_peso(animales):.2f} kg")
 
     mayores = animales_mayores_de(animales, 4)
@@ -137,11 +153,11 @@ def _usar_servicios(animales: list) -> None:
 def main() -> None:
     """Ejecuta la demostración completa de principio a fin."""
     print("DEMO DE POO: ANIMALES")
-    perro, gato = _crear_animales()
-    _mostrar_comportamiento(perro, gato)
-    _mostrar_encapsulamiento(perro, gato)
+    perro, gato, loro = _crear_animales()
+    _mostrar_comportamiento(perro, gato, loro)
+    _mostrar_encapsulamiento(perro, gato, loro)
     _mostrar_abstraccion()
-    animales = [perro, gato]
+    animales = [perro, gato, loro]
     _mostrar_polimorfismo(animales)
     _usar_servicios(animales)
     _titulo("Fin de la demostración")

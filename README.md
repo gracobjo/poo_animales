@@ -4,7 +4,7 @@ Proyecto de ejemplo en Python para practicar los cuatro pilares de la programaci
 
 Repositorio: [https://github.com/gracobjo/poo_animales](https://github.com/gracobjo/poo_animales)
 
-`Animal` es una clase abstracta. `Perro` y `Gato` la heredan, guardan su estado en atributos privados y exponen ese estado con propiedades validadas. Las funciones de `gestion_animales` trabajan con cualquier animal sin preguntar de qué especie es.
+`Animal` es una clase abstracta. `Perro`, `Gato` y `Loro` la heredan, guardan su estado en atributos privados y exponen ese estado con propiedades validadas. Las funciones de `gestion_animales` trabajan con cualquier animal sin preguntar de qué especie es.
 
 Solo usa la biblioteca estándar. Requiere Python 3.8 o superior.
 
@@ -13,7 +13,7 @@ Solo usa la biblioteca estándar. Requiere Python 3.8 o superior.
 | Documento | Para qué sirve |
 | --- | --- |
 | [Casos de uso](docs/casos_de_uso.md) | Qué puede hacer quien usa la biblioteca: registrar, alimentar, vacunar, cazar y consultar un grupo. Incluye flujos alternativos y errores. |
-| [Manual de desarrollador](docs/manual_desarrollador.md) | Arquitectura, API, errores, pruebas y cómo añadir una especie nueva. |
+| [Manual de desarrollador](docs/manual_desarrollador.md) | Arquitectura, API, errores y pruebas. Incluye cómo crear las carpetas por primera vez y [cómo añadir una especie nueva](docs/manual_desarrollador.md#7-cómo-añadir-una-especie) (ejemplo paso a paso con el loro). |
 
 ## Conceptos implementados
 
@@ -27,14 +27,15 @@ Solo usa la biblioteca estándar. Requiere Python 3.8 o superior.
 
 - **Perro:** `ladrar`, `comer`, `jugar`, `descansar`, `vacunar`
 - **Gato:** `maullar`, `ronronear`, `cazar`, `comer`, `dormir`
+- **Loro:** `hablar`, `aprender`, `volar`, `comer`
 
 ### Encapsulamiento
 
-El peso, el color y la energía usan doble guion bajo (`__peso`, `__color`, `__energia`). Desde fuera de la clase esos nombres no son visibles: Python aplica *name mangling*. Los getters y setters (`@property`) validan los datos y lanzan `ValueError` cuando no sirven. `vacunado` y `presas_cazadas` son de solo lectura.
+El peso, el color y la energía usan doble guion bajo (`__peso`, `__color`, `__energia`). Desde fuera de la clase esos nombres no son visibles: Python aplica *name mangling*. Los getters y setters (`@property`) validan los datos y lanzan `ValueError` cuando no sirven. `vacunado`, `presas_cazadas` y `frase` son de solo lectura.
 
 ### Polimorfismo
 
-`emitir_sonido`, `alimentar`, `listar_info`, `animales_mayores_de` y `total_peso` reciben un `Animal` o una secuencia de animales. La misma llamada produce el ladrido de un perro o el maullido de un gato según la clase real del objeto.
+`emitir_sonido`, `alimentar`, `listar_info`, `animales_mayores_de` y `total_peso` reciben un `Animal` o una secuencia de animales. La misma llamada produce el ladrido de un perro, el maullido de un gato o la frase de un loro según la clase real del objeto.
 
 ## Estructura del proyecto
 
@@ -55,7 +56,8 @@ animales_poo/
 │   │   ├── __init__.py
 │   │   ├── animal.py
 │   │   ├── perro.py
-│   │   └── gato.py
+│   │   ├── gato.py
+│   │   └── loro.py
 │   ├── servicios/
 │   │   ├── __init__.py
 │   │   └── gestion_animales.py
@@ -65,7 +67,8 @@ animales_poo/
 └── tests/
     ├── __init__.py
     ├── test_perro.py
-    └── test_gato.py
+    ├── test_gato.py
+    └── test_loro.py
 ```
 
 ## Instrucciones de ejecución
@@ -88,19 +91,25 @@ python -m unittest discover -s tests -v
 
 ```python
 from src.modelos.gato import Gato
+from src.modelos.loro import Loro
 from src.modelos.perro import Perro
 from src.servicios.gestion_animales import alimentar, emitir_sonido, total_peso
 
 perro = Perro("Rex", 5, 12.0, "marrón")
 gato = Gato("Misi", 3, 4.5, "blanco")
+loro = Loro("Kiko", 4, 0.4, "verde")
 
 print(emitir_sonido(perro))          # Rex dice: ¡Guau!
 print(emitir_sonido(gato))           # Misi dice: ¡Miau!
+print(emitir_sonido(loro))           # Kiko dice: ¡Aaah!
+loro.aprender("Hola")
+print(emitir_sonido(loro))           # Kiko dice: Hola
 print(alimentar(perro, 200))
-print(total_peso([perro, gato]))
+print(total_peso([perro, gato, loro]))
 
 perro.jugar()
 gato.cazar()
+loro.volar()
 ```
 
 Un peso negativo, una edad fuera de 0–30 o una segunda vacunación lanzan `ValueError`. Intentar `Animal("Fantasma", 1)` lanza `TypeError`, porque la clase es abstracta.
@@ -120,3 +129,7 @@ Un peso negativo, una edad fuera de 0–30 o una segunda vacunación lanzan `Val
 | Cazar (gato) | Consume 25 de energía y suma una presa |
 | Dormir (gato) | Recupera 40 de energía |
 | Ronronear (gato) | Exige al menos 20 de energía y no la consume |
+| Hablar (loro) | Repite la frase aprendida, o grazna si no hay ninguna |
+| Aprender (loro) | Guarda una frase no vacía. `frase` es de solo lectura |
+| Volar (loro) | Consume 30 de energía |
+| Comer (loro) | Recupera 12 de energía, sin pasar de 100 |
