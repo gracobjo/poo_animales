@@ -14,10 +14,12 @@ para aprender y escalar). Incluye criterios para saber cuándo *no* usarla.
 ## Cómo usarla en la práctica
 
 1. Copia este archivo a tu nuevo repo (o a una carpeta de plantillas).
-2. Rellena la **Fase 2** a mano (sustituye la columna “Tu proyecto”).
-3. Crea las carpetas de la **Fase 1** (script PowerShell al final).
-4. Programa siguiendo el orden de la **Fase 3**.
-5. Cierra con el checklist de la **Fase 4**.
+2. Evalúa el alcance (**Fase 0**).
+3. Analiza el dominio: planteamiento → entidades → E/R → UML (**Fase 1**).
+4. Crea las carpetas (**Fase 2**; script PowerShell al final).
+5. Rellena la tabla OOP (**Fase 3**).
+6. Programa en el orden de la **Fase 4**.
+7. Cierra con el checklist de la **Fase 5**.
 
 ---
 
@@ -30,14 +32,31 @@ Marca con ✅ el nivel. Confirma que esta plantilla encaja.
 | 1 | Script / aprendizaje puro (1–3 archivos, sin tests) | **No.** Un solo `.py` basta. |
 | 2 | Proyecto estándar / educativo / librería (≈4–20 archivos, lógica clara, tests) | **✅ Sí. Esta plantilla.** |
 | 3 | App empresarial / DDD (varios equipos, BD complejas, microservicios) | **No.** Arquitectura por dominios: Domain / Application / Infrastructure. |
-| 4 | Proyecto gobernado por un framework (Django, FastAPI “full”, Flask app factory) | **Parcial.** Respeta la estructura del framework; reutiliza solo Fase 2 y 4. |
+| 4 | Proyecto gobernado por un framework (Django, FastAPI “full”, Flask app factory) | **Parcial.** Respeta la estructura del framework; reutiliza Fases 1 (análisis), 3 (diseño) y 5 (checklist). |
 
 > **Este repo (`poo_animales`)** es Nivel 2. La API FastAPI en `src/api/` es
 > una ampliación opcional (hacia Nivel 4 ligero), no el núcleo didáctico.
 
 ---
 
-## Fase 1: Estructura de carpetas (Src Layout)
+## Fase 1: Análisis del dominio (del planteamiento a las entidades)
+
+Antes de carpetas y código hay que **descubrir** entidades y relaciones.
+
+El método completo (planteamiento, sustantivos/verbos, E/R extendido,
+diagramas UML de clases / casos de uso / secuencia, mapa a código y
+checklist) está en un documento aparte para que el editor lo abra sin
+necesidad de anclas `#...` en el enlace:
+
+**[analisis_entidades_ER_UML.md](analisis_entidades_ER_UML.md)**
+
+Resumen: planteamiento → candidatos (sustantivo/verbo) → E/R extendido
+(generalización, cardinalidades) → UML → implementación (`ABC`,
+properties, servicios).
+
+---
+
+## Fase 2: Estructura de carpetas (Src Layout)
 
 Estructura **estándar** recomendada para proyectos Python medianos.
 Sustituye `nombre_del_proyecto` y `[entidad]` / `[gestion]` por tu dominio.
@@ -80,7 +99,7 @@ nombre_del_proyecto/
 | Necesidad | Dónde |
 | --- | --- |
 | Documentación larga | `docs/` (casos de uso, tutorial, plantillas) |
-| API HTTP + Swagger | `src/api/` (FastAPI) — ver evolución en Fase 5 |
+| API HTTP + Swagger | `src/api/` (FastAPI) — ver evolución en Fase 6 |
 | Persistencia | `src/repositorios/` o `src/infraestructura/` |
 
 ### Nota sobre nombres en el proyecto Animales
@@ -95,10 +114,11 @@ Lo importante es: **una clase ABC + concretas en `modelos/`**, no el nombre del 
 
 ---
 
-## Fase 2: Plantilla de diseño OOP
+## Fase 3: Plantilla de diseño OOP
 
-**No escribas código** hasta tener esta tabla clara.
+**No escribas código** hasta tener el análisis (Fase 1) y esta tabla claros.
 Sustituye la columna *Tu proyecto*. La de Animales es el ejemplo ya resuelto.
+Los diagramas de la Fase 1 alimentan esta tabla (no la sustituyen).
 
 | Elemento de diseño | Tu proyecto (rellenar) | Ejemplo — Proyecto Animales |
 | --- | --- | --- |
@@ -119,7 +139,7 @@ Sustituye la columna *Tu proyecto*. La de Animales es el ejemplo ya resuelto.
 
 ---
 
-## Fase 3: Flujo de trabajo de codificación (orden obligatorio)
+## Fase 4: Flujo de trabajo de codificación (orden obligatorio)
 
 Este orden evita imports circulares y bases flojas.
 
@@ -153,7 +173,7 @@ python -m unittest discover -s tests -v
 
 ---
 
-## Fase 4: Checklist de calidad POO (autoevaluación)
+## Fase 5: Checklist de calidad POO (autoevaluación)
 
 Antes de dar el proyecto por cerrado:
 
@@ -181,6 +201,11 @@ Antes de dar el proyecto por cerrado:
 - [ ] Esa función **no** ramifica con `isinstance` por cada hija (salvo casos excepcionales y documentados).
 - [ ] Añadir una hija nueva no obliga a reescribir ese servicio.
 
+### Análisis previo (Fase 1)
+
+- [ ] Existe un planteamiento escrito y una clasificación entidad/atributo.
+- [ ] Hay al menos un diagrama E/R o de clases UML coherente con el código.
+
 ### Ingeniería básica
 
 - [ ] `main.py` es delgado.
@@ -189,7 +214,7 @@ Antes de dar el proyecto por cerrado:
 
 ---
 
-## Fase 5: Escalabilidad (si el proyecto crece)
+## Fase 6: Escalabilidad (si el proyecto crece)
 
 | Si necesitas… | Cómo evolucionar `src/` |
 | --- | --- |
@@ -209,7 +234,7 @@ src/
 └── api/          ← NUEVO: FastAPI + schemas + store en memoria
 ```
 
-Swagger documenta la **capa HTTP**, no sustituye el diseño OOP de la Fase 2.
+Swagger documenta la **capa HTTP**, no sustituye el análisis (Fase 1) ni el diseño OOP (Fase 3).
 
 ---
 
@@ -291,6 +316,21 @@ PROYECTO: _______________________________  FECHA: __________
 
 Nivel (Fase 0): [ ]1  [x]2  [ ]3  [ ]4
 
+--- Análisis (Fase 1) ---
+Actor(es): ________________________________________________
+Planteamiento (5–10 líneas):
+___________________________________________________________
+___________________________________________________________
+
+Sustantivos → entidades: ___________________________________
+Sustantivos → atributos: ___________________________________
+Verbos → métodos / casos de uso: ___________________________
+
+Especializaciones (A es un B): _____________________________
+Relaciones y cardinalidades: _______________________________
+¿Diagrama E/R hecho? [ ]   ¿UML clases? [ ]   ¿Secuencia? [ ]
+
+--- Diseño OOP (Fase 3) ---
 Objetivo:
 ___________________________________________________________
 

@@ -229,6 +229,9 @@ El sistema debe permitir:
 
 ## 4. Análisis del dominio
 
+> Método general (planteamiento → sustantivos/verbos → E/R extendido → UML)
+> para *cualquier* proyecto: [Análisis entidades / E/R / UML](analisis_entidades_ER_UML.md).
+
 ### 4.1 Entidades (sustantivos)
 
 | Entidad | Descripción | Atributos principales |
