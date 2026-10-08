@@ -10,10 +10,34 @@ Solo usa la biblioteca estándar. Requiere Python 3.8 o superior.
 
 ## Documentación
 
-| Documento | Para qué sirve |
+Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tabla según lo que necesites.
+
+### Mapa rápido
+
+| Si quieres… | Abre |
 | --- | --- |
-| [Casos de uso](docs/casos_de_uso.md) | Qué puede hacer quien usa la biblioteca: registrar, alimentar, vacunar, cazar y consultar un grupo. Incluye flujos alternativos y errores. |
-| [Manual de desarrollador](docs/manual_desarrollador.md) | Arquitectura, API, errores y pruebas. Incluye cómo crear las carpetas por primera vez y [cómo añadir una especie nueva](docs/manual_desarrollador.md#7-cómo-añadir-una-especie) (ejemplo paso a paso con el loro). |
+| Aprender POO con ejercicios (curso) | [Tutorial de especialización](docs/tutorial_especializacion.md) |
+| Comparar clases frente a `dict` | [Tutorial, unidades 1 y 5](docs/tutorial_especializacion.md#unidad-1-el-mismo-problema-primero-con-diccionarios) |
+| Ver qué puede hacer el cuidador | [Casos de uso](docs/casos_de_uso.md) |
+| Entender la arquitectura y la API | [Manual de desarrollador](docs/manual_desarrollador.md) |
+| Crear las carpetas por primera vez (PowerShell) | [Manual, sección 2](docs/manual_desarrollador.md#2-crear-las-carpetas-por-primera-vez) |
+| Añadir una especie nueva (ej. loro) | [Manual, sección 7](docs/manual_desarrollador.md#7-cómo-añadir-una-especie) |
+| Ejecutar la demo o los tests | [Instrucciones de ejecución](#instrucciones-de-ejecución) más abajo |
+| Ver un ejemplo de código mínimo | [Ejemplo de uso](#ejemplo-de-uso) más abajo |
+
+### Índice de documentos
+
+| Documento | Ruta | Público | Contenido |
+| --- | --- | --- | --- |
+| [Tutorial de especialización](docs/tutorial_especializacion.md) | `docs/tutorial_especializacion.md` | Alumnado / curso | 10 unidades, ejemplos guiados, POO vs `dict`, autoevaluación |
+| [Casos de uso](docs/casos_de_uso.md) | `docs/casos_de_uso.md` | Análisis / producto | CU-01 a CU-19: flujos, errores y postcondiciones |
+| [Manual de desarrollador](docs/manual_desarrollador.md) | `docs/manual_desarrollador.md` | Desarrolladores | Estructura, API, errores, pruebas, cómo extender |
+
+En GitHub también puedes abrirlos desde el repositorio:
+
+- [Tutorial](https://github.com/gracobjo/poo_animales/blob/main/docs/tutorial_especializacion.md)
+- [Casos de uso](https://github.com/gracobjo/poo_animales/blob/main/docs/casos_de_uso.md)
+- [Manual](https://github.com/gracobjo/poo_animales/blob/main/docs/manual_desarrollador.md)
 
 ## Conceptos implementados
 
@@ -46,7 +70,8 @@ animales_poo/
 ├── .gitignore
 ├── docs/
 │   ├── casos_de_uso.md
-│   └── manual_desarrollador.md
+│   ├── manual_desarrollador.md
+│   └── tutorial_especializacion.md
 ├── ejemplos/
 │   ├── __init__.py
 │   └── demo_completa.py

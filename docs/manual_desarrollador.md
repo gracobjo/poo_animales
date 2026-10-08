@@ -1,6 +1,6 @@
 # Manual de desarrollador
 
-Guía para entender, ejecutar y extender el proyecto. El lector que solo quiere ver la demo puede quedarse en el [README](../README.md). Los escenarios funcionales están en [Casos de uso](casos_de_uso.md).
+Guía para entender, ejecutar y extender el proyecto. El lector que solo quiere ver la demo puede quedarse en el [README](../README.md). Los escenarios funcionales están en [Casos de uso](casos_de_uso.md). Para un curso paso a paso (incluye comparación con `dict`), ver el [Tutorial de especialización](tutorial_especializacion.md).
 
 Repositorio: [https://github.com/gracobjo/poo_animales](https://github.com/gracobjo/poo_animales)
 
@@ -59,6 +59,7 @@ Este repositorio añade también la documentación y el archivo que Git ignora. 
 ```powershell
 Crear-Archivo "animales_poo\docs\casos_de_uso.md"
 Crear-Archivo "animales_poo\docs\manual_desarrollador.md"
+Crear-Archivo "animales_poo\docs\tutorial_especializacion.md"
 Crear-Archivo "animales_poo\.gitignore"
 ```
 
@@ -80,7 +81,8 @@ animales_poo
 ├── .gitignore
 ├── docs
 │   ├── casos_de_uso.md
-│   └── manual_desarrollador.md
+│   ├── manual_desarrollador.md
+│   └── tutorial_especializacion.md
 ├── ejemplos
 │   ├── __init__.py
 │   └── demo_completa.py
