@@ -14,7 +14,7 @@ CRUD Tkinter sobre diccionarios, con ficha clínica, adjuntos, portapapeles, PDF
 | --- | --- | --- |
 | Arranque | `app.py`, `main.py` | `Tk`, inventario, `mainloop` |
 | Presentación | `interfaz/` | GUI, estilos, ficha clínica, portapapeles, miniatura |
-| Dominio | `datos/` | Constantes, inventario CRUD, ficha clínica, adjuntos, **modelos POO**, **catálogo de especies** |
+| Dominio | `datos/` | CRUD, persistencia JSON del inventario, ficha clínica, adjuntos, **modelos POO**, **catálogo de especies** |
 | Reglas | `validaciones/reglas.py` | `validar_datos` (+ listas clínicas) |
 | Exportación | `exportacion/pdf_fichas.py` | PDF por animal |
 | Pruebas | `tests/`, `ejecutar_tests.py` | unittest + informes |
@@ -55,12 +55,15 @@ tarea1/
 ├── app.py / main.py / ejecutar_tests.py / probar_crud.py
 ├── datos/
 │   ├── constantes.py      # ESPECIES, PESO_MIN_KG, PESO_MAX_KG
-│   ├── inventario.py      # CRUD + animales_iniciales
-│   ├── ficha.py           # Normalización clínica
-│   ├── adjuntos.py        # Copia/pegar bytes, límite 5 MB
-│   ├── modelos.py         # AnimalRefugio ABC + subclases (@property)
-│   ├── decoradores.py     # @cuenta_usos (decorador propio)
-│   └── adaptador_poo.py   # dict ↔ objeto + resumen polimórfico
+│   ├── inventario.py              # CRUD + animales_iniciales
+│   ├── persistencia_inventario.py # inventario.json (separado del catálogo)
+│   ├── ficha.py                   # Normalización clínica
+│   ├── adjuntos.py                # Copia/pegar bytes, límite 5 MB
+│   ├── modelos.py                 # AnimalRefugio ABC + subclases (@property)
+│   ├── decoradores.py             # @cuenta_usos (decorador propio)
+│   ├── adaptador_poo.py           # dict ↔ objeto + resumen polimórfico
+│   ├── gestor_especies.py         # Catálogo + especies_personalizadas.json
+│   └── recursos.py                # Logo
 ├── validaciones/reglas.py
 ├── interfaz/
 │   ├── gestor.py          # Ventana principal + panel foto
@@ -258,18 +261,21 @@ En `gestor.py`:
 3. Si necesita gráficos: `Toplevel` nuevo; no hinchar el constructor principal.  
 4. Tests unitarios de la función pura + smoke GUI opcional.
 
-### 7.9 Persistencia en disco (JSON / CSV / SQLite)
+### 7.9 Persistencia en disco (JSON)
 
-Hoy todo es **memoria**. Plan mínimo JSON:
+Ya hay **dos** archivos JSON, a propósito separados:
 
 | Pieza | Dónde |
 | --- | --- |
-| `guardar` / `cargar` | Nuevo `datos/persistencia.py` |
-| Convertir claves `str`→`int` al cargar | En el loader |
-| Llamar al salir / al arrancar | `app.py` o menú en `gestor.py` |
+| Catálogo de especies | `datos/especies_personalizadas.json` vía `gestor_especies.py` |
+| Inventario de animales | `datos/inventario.json` vía `persistencia_inventario.py` |
+| Carga al arrancar | `app.py` → `cargar_inventario()` |
+| Guardado tras CRUD / clínica | `GestorAnimales._persistir_inventario()` |
+| Tests de GUI | `persistir=False` para no tocar el JSON real |
+| Claves `str`→`int` | En el loader |
 | Rutas de foto/documentos | Relativas a `adjuntos/` |
 
-No meter I/O dentro de `validar_datos`.
+Escritura atómica (temporal + `replace`). No meter I/O dentro de `validar_datos`.
 
 ### 7.10 Capa POO (ya incorporada) y cómo ampliarla
 
@@ -335,15 +341,15 @@ No hay i18n: literales en español en UI y `ValueError`. Para un cambio puntual,
 
 | Qué | Dónde |
 | --- | --- |
-| Animales al arrancar | `animales_iniciales()` en `inventario.py` |
+| Animales al arrancar | `cargar_inventario()`; si no hay JSON, siembra `animales_iniciales()` |
 | Ficheros de ejemplo | `muestras/` + `muestras/generar_muestras.py` |
 | Adjuntos de sesión | `adjuntos/<id>/` (generados en runtime; no versionar basura) |
 
 ### 7.15 Arranque, título, tamaño de ventana
 
 - Título / `geometry` / `minsize`: `__init__` de `GestorAnimales`.  
-- Inventario inyectado: `app.py` / `main.py` (`animales_iniciales()` → `GestorAnimales`).  
-- Para demos: se puede pasar otro `dict` sin tocar la clase.
+- Inventario inyectado: `app.py` / `main.py` (`cargar_inventario()` → `GestorAnimales`).  
+- Para demos: se puede pasar otro `dict` y `persistir=False` sin tocar la clase.
 
 ### 7.16 Tests y regresión tras un cambio del tribunal
 

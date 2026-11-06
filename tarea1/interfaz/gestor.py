@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 from datos.adaptador_poo import registro_a_animal, resumen_polimorfico
 from datos.gestor_especies import get_catalogo
@@ -15,6 +16,7 @@ from datos.inventario import (
     leer_animal,
 )
 from datos.ficha import asegurar_campos_clinicos
+from datos.persistencia_inventario import guardar_inventario
 from datos.recursos import ruta_logo_refugio
 from interfaz.dialogo_especies import DialogoGestionEspecies
 from interfaz.estilos import aplicar_tema, configurar_texto
@@ -25,9 +27,20 @@ from interfaz.vista_foto import cargar_miniatura
 class GestorAnimales:
     """Ventana principal del refugio: formulario, filtros y tabla."""
 
-    def __init__(self, raiz: tk.Tk, inventario: Dict[int, Dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        raiz: tk.Tk,
+        inventario: Dict[int, Dict[str, Any]],
+        *,
+        persistir: bool = True,
+        ruta_inventario: Optional[Union[Path, str]] = None,
+    ) -> None:
         self.raiz = raiz
         self.inventario = inventario
+        self._persistir = persistir
+        self._ruta_inventario = (
+            Path(ruta_inventario) if ruta_inventario is not None else None
+        )
         self.catalogo = get_catalogo()
         especies_alta = self.catalogo.nombres_activos_para_alta()
         self.nombre_var = tk.StringVar()
@@ -382,6 +395,7 @@ class GestorAnimales:
         except ValueError as error:
             messagebox.showerror("No se pudo crear el registro", str(error))
             return
+        self._persistir_inventario()
         self._actualizar_tabla()
         self._limpiar()
         self.estado_var.set(
@@ -401,6 +415,7 @@ class GestorAnimales:
                 "No se pudo actualizar el registro", str(error)
             )
             return
+        self._persistir_inventario()
         self._actualizar_tabla()
         self.estado_var.set(f"Registro {animal_id} actualizado.")
 
@@ -418,9 +433,23 @@ class GestorAnimales:
         except ValueError as error:
             messagebox.showerror("No se pudo borrar el registro", str(error))
             return
+        self._persistir_inventario()
         self._actualizar_tabla()
         self._limpiar()
         self.estado_var.set(f"Registro {animal_id} eliminado.")
+
+    def _persistir_inventario(self) -> None:
+        """Guarda el inventario en JSON (independiente del catálogo de especies)."""
+        if not self._persistir:
+            return
+        try:
+            guardar_inventario(self.inventario, self._ruta_inventario)
+        except OSError as error:
+            messagebox.showerror(
+                "No se pudo guardar el inventario",
+                "Los cambios están en memoria, pero falló la escritura "
+                f"en disco:\n{error}",
+            )
 
     def _seleccionar(self, evento=None) -> None:
         seleccion = self.tabla.selection()
@@ -552,6 +581,7 @@ class GestorAnimales:
         self._actualizar_tabla()
 
     def _tras_cambio_clinico(self, animal_id: int) -> None:
+        self._persistir_inventario()
         if animal_id in self.inventario:
             self._mostrar_foto_formulario(self.inventario[animal_id].get("foto"))
         if animal_id in self.inventario and self.tabla.selection():

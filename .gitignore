@@ -8,3 +8,5 @@ venv/
 .mypy_cache/
 .idea/
 .vscode/
+tarea1/datos/inventario.json
+tarea1/adjuntos/*/

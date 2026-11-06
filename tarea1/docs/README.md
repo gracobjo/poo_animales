@@ -10,9 +10,11 @@
 | [manual_desarrollador.md](manual_desarrollador.md) | Arquitectura, módulos, portapapeles, PDF, tests |
 | [pruebas.md](pruebas.md) | Cómo ejecutar tests y dónde se guarda el resultado |
 | [uml.md](uml.md) | Clases, componentes, despliegue, objetos, CU, secuencia, actividades |
+| [Arquitectura_Refugio_Animal_v3.pdf](Arquitectura_Refugio_Animal_v3.pdf) | Análisis de carpetas, módulos, POO y persistencia |
 
 **Programa (GUI completa):** `python tarea1/app.py` o `python tarea1/main.py`  
 **Pruebas:** `python tarea1/ejecutar_tests.py` → `tarea1/tests/resultados/`  
 **Muestras:** [../muestras/README.md](../muestras/README.md)  
 **Defensa rápida:** [../Analisis_defensa_gestion_animales.md](../Analisis_defensa_gestion_animales.md)  
-**Cuaderno (demo didáctica, GUI reducida):** [../../gestion_animales_tkinter.ipynb](../../gestion_animales_tkinter.ipynb) — diferencias en [../README.md](../README.md#cuaderno-vs-programa-apppy--mainpy)
+**Cuaderno (demo didáctica, GUI reducida):** [../../gestion_animales_tkinter.ipynb](../../gestion_animales_tkinter.ipynb) — diferencias en [../README.md](../README.md#cuaderno-vs-programa-apppy--mainpy)  
+**Cuaderno de arquitectura v3:** [../../arquitectura_refugio_animal_v3.ipynb](../../arquitectura_refugio_animal_v3.ipynb)

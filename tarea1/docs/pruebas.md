@@ -7,6 +7,7 @@ Los tests viven en `tarea1/tests/` y usan el módulo estándar **`unittest`**.
 | Archivo | Cobertura |
 | --- | --- |
 | `test_datos.py` | Inventario y CRUD |
+| `test_persistencia_inventario.py` | Carga/guarda `inventario.json` |
 | `test_validaciones.py` | `validar_datos()` |
 | `test_interfaz.py` | GUI (`GestorAnimales`): CRUD, filtros, diálogos |
 | `test_exportacion_pdf.py` | Exportación PDF y botón Exportar |

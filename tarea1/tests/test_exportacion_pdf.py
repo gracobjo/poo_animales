@@ -109,7 +109,9 @@ class TestExportarDesdeInterfaz(unittest.TestCase):
         self.raiz = tk.Tk()
         self.raiz.withdraw()
         self.inventario = animales_iniciales()
-        self.gestor = GestorAnimales(self.raiz, self.inventario)
+        self.gestor = GestorAnimales(
+            self.raiz, self.inventario, persistir=False
+        )
         self.raiz.update_idletasks()
 
     def tearDown(self) -> None:

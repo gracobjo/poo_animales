@@ -24,6 +24,7 @@ Las dos interfaces **no son idénticas**. El cuaderno enseña el núcleo; la ent
 | Miniatura de foto en el formulario | No | Sí |
 | Botón ficha clínica / adjuntos | No | Sí |
 | Exportar PDF | No | Sí |
+| Persistencia inventario (`inventario.json`) | No | Sí |
 | Estilos / tipografía (`estilos.py`) | Básicos de ttk | Tema completo |
 | Título de ventana | *…(demo cuaderno)* | *Refugio Animal - Gestión de animales* |
 
@@ -84,6 +85,7 @@ python -m unittest discover -s tarea1/tests -v
 | `tests/test_exportacion_pdf.py` | PDF de fichas |
 | `tests/test_ficha_clinica.py` | Tratamientos, vacunas, docs, foto |
 | `tests/test_modelos_poo.py` | Herencia, `@property`, decoradores, adaptador |
+| `tests/test_persistencia_inventario.py` | `inventario.json` carga/guarda |
 
 Dependencia PDF: `pip install fpdf2`
 
@@ -98,15 +100,17 @@ tarea1/
 ├── datos/
 │   ├── __init__.py
 │   ├── constantes.py      # ESPECIES, rangos de peso
-│   ├── inventario.py      # animales_iniciales + CRUD
-│   ├── ficha.py           # Tratamientos, vacunas, docs, foto
-│   ├── adjuntos.py        # Copia de archivos a adjuntos/
-│   ├── modelos.py         # ABC AnimalRefugio + EspeciePersonalizada
-│   ├── decoradores.py     # Decorador propio @cuenta_usos
-│   ├── adaptador_poo.py   # Puente dict ↔ objeto
-│   ├── gestor_especies.py # Catálogo nativas + personalizadas
+│   ├── inventario.py              # animales_iniciales + CRUD
+│   ├── persistencia_inventario.py # inventario.json (carga/guarda)
+│   ├── ficha.py                   # Tratamientos, vacunas, docs, foto
+│   ├── adjuntos.py                # Copia de archivos a adjuntos/
+│   ├── modelos.py                 # ABC AnimalRefugio + EspeciePersonalizada
+│   ├── decoradores.py             # Decorador propio @cuenta_usos
+│   ├── adaptador_poo.py           # Puente dict ↔ objeto
+│   ├── gestor_especies.py         # Catálogo nativas + personalizadas
 │   ├── especies_personalizadas.json
-│   └── recursos.py        # Logo refugio.png / .jpg
+│   ├── inventario.json            # (runtime) animales persistidos
+│   └── recursos.py                # Logo refugio.png / .jpg
 ├── refugio.jpg            # (o refugio.png) logo GUI + PDF
 ├── validaciones/
 │   ├── __init__.py
@@ -126,6 +130,7 @@ tarea1/
 │   ├── test_interfaz.py
 │   ├── test_datos.py
 │   ├── test_validaciones.py
+│   ├── test_persistencia_inventario.py
 │   ├── test_exportacion_pdf.py
 │   └── test_ficha_clinica.py
 ├── docs/
@@ -133,11 +138,13 @@ tarea1/
 │   ├── casos_de_uso.md
 │   ├── manual_usuario.md
 │   ├── manual_desarrollador.md
-│   └── uml.md
+│   ├── uml.md
+│   ├── pruebas.md
+│   └── Arquitectura_Refugio_Animal_v3.pdf
 ├── Enunciado_oficial_Tarea_1.pdf
 ├── Analisis_defensa_gestion_animales.md
-├── Tarea_1.pdf
 ├── generar_pdf.py
+├── generar_arquitectura_docs.py
 └── README.md
 ```
 
@@ -145,12 +152,12 @@ tarea1/
 
 | Módulo | Contenido |
 | --- | --- |
-| `datos/` | `ESPECIES`, inventario inicial y funciones CRUD |
+| `datos/` | CRUD, modelos POO, catálogo de especies e `inventario.json` |
 | `validaciones/` | `validar_datos()` |
 | `interfaz/` | Clase `GestorAnimales` |
 | `app.py` / `main.py` | Arranque (pocas líneas) |
 
-Los datos siguen en un **diccionario en memoria** (sin base de datos), como pide el enunciado.
+El inventario se manipula en memoria como **diccionarios** y se **persiste** en `datos/inventario.json` (archivo distinto del catálogo de especies).
 
 ## Documentación
 
@@ -166,9 +173,10 @@ Los datos siguen en un **diccionario en memoria** (sin base de datos), como pide
 | [docs/pruebas.md](docs/pruebas.md) | Tests e informes en `tests/resultados/` |
 | [muestras/README.md](muestras/README.md) | Fotos y documentos de prueba |
 | [Analisis_defensa_gestion_animales.md](Analisis_defensa_gestion_animales.md) | Guía corta de defensa oral |
-| [Tarea_1.pdf](Tarea_1.pdf) | Defensa en PDF |
+| [docs/Arquitectura_Refugio_Animal_v3.pdf](docs/Arquitectura_Refugio_Animal_v3.pdf) | Análisis de arquitectura (PDF) |
 | [Enunciado_oficial_Tarea_1.pdf](Enunciado_oficial_Tarea_1.pdf) | Enunciado |
-| [../gestion_animales_tkinter.ipynb](../gestion_animales_tkinter.ipynb) | Cuaderno = defensa / documentación narrada |
+| [../gestion_animales_tkinter.ipynb](../gestion_animales_tkinter.ipynb) | Cuaderno didáctico CRUD / POO |
+| [../arquitectura_refugio_animal_v3.ipynb](../arquitectura_refugio_animal_v3.ipynb) | Cuaderno de arquitectura v3 |
 
 ## Temario
 
@@ -211,7 +219,7 @@ Puedes ampliar el catálogo **desde Tkinter** (botón *Gestionar especies*) sin 
 
 `EspeciePersonalizada` hereda de `AnimalRefugio` e implementa sonido, alimentación y cuidados con los textos configurados en el formulario. **No** se generan clases nuevas ni se usa `eval()`: el polimorfismo basta (mismo contrato, distinta configuración).
 
-Persistencia: `datos/especies_personalizadas.json` (UTF-8). El inventario de animales sigue en diccionarios en memoria.
+Persistencia: `datos/especies_personalizadas.json` (catálogo) e `datos/inventario.json` (animales). Ambos son UTF-8 y están separados a propósito.
 
 ```text
 Usuario

@@ -22,13 +22,13 @@ if str(RAIZ_PROGRAMA) not in sys.path:
 
 import tkinter as tk
 
-from datos.inventario import animales_iniciales
+from datos.persistencia_inventario import cargar_inventario
 from interfaz.gestor import GestorAnimales
 
 
 def main() -> None:
-    """Crea la ventana, carga el inventario y arranca el bucle de eventos."""
-    inventario = animales_iniciales()
+    """Crea la ventana, carga el inventario persistido y arranca Tkinter."""
+    inventario = cargar_inventario()
     raiz = tk.Tk()
     GestorAnimales(raiz, inventario)
     raiz.mainloop()
