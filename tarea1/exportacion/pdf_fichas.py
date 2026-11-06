@@ -7,12 +7,15 @@ se inserta una miniatura (PNG/JPG) en la esquina superior derecha.
 
 from __future__ import annotations
 
+import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional, Sequence, Tuple, Union
 
 from fpdf import FPDF
+
+from datos.recursos import ruta_logo_refugio
 
 Inventario = Mapping[int, Mapping[str, Any]]
 Ruta = Union[str, Path]
@@ -98,25 +101,28 @@ def _preparar_imagen_para_pdf(ruta: Path, max_px: int = 420) -> Optional[Path]:
         return ruta if sufijo in {".png", ".jpg", ".jpeg"} else None
 
 
-def _dibujar_foto(
+def _dibujar_imagen(
     pdf: PdfFichas,
-    ruta_foto: str,
-    x: float = 135,
-    y: float = 28,
-    ancho: float = 50,
+    ruta: Path,
+    *,
+    x: float,
+    y: float,
+    ancho: float,
+    max_px: int = 420,
+    con_marco: bool = False,
 ) -> bool:
-    """Inserta la foto en la ficha. Devuelve True si se embebió."""
-    path = Path(ruta_foto)
-    imagen = _preparar_imagen_para_pdf(path)
+    """Inserta una imagen (logo o foto). Devuelve True si se embebió."""
+    imagen = _preparar_imagen_para_pdf(ruta, max_px=max_px)
     if imagen is None:
         return False
     temporales = []
-    if imagen != path:
+    if imagen != ruta:
         temporales.append(imagen)
     try:
         pdf.image(str(imagen), x=x, y=y, w=ancho)
-        pdf.set_draw_color(60, 90, 140)
-        pdf.rect(x - 1, y - 1, ancho + 2, ancho + 2)
+        if con_marco:
+            pdf.set_draw_color(60, 90, 140)
+            pdf.rect(x - 1, y - 1, ancho + 2, ancho + 2)
         return True
     except Exception:
         return False
@@ -126,6 +132,41 @@ def _dibujar_foto(
                 tmp.unlink(missing_ok=True)
             except OSError:
                 pass
+
+
+def _dibujar_logo(
+    pdf: PdfFichas,
+    *,
+    x: float,
+    y: float,
+    ancho: float,
+) -> bool:
+    """Inserta el logo ``refugio.png`` / ``.jpg`` si está disponible."""
+    logo = ruta_logo_refugio()
+    if logo is None:
+        return False
+    return _dibujar_imagen(
+        pdf, logo, x=x, y=y, ancho=ancho, max_px=280, con_marco=False
+    )
+
+
+def _dibujar_foto(
+    pdf: PdfFichas,
+    ruta_foto: str,
+    x: float = 135,
+    y: float = 28,
+    ancho: float = 50,
+) -> bool:
+    """Inserta la foto en la ficha. Devuelve True si se embebió."""
+    return _dibujar_imagen(
+        pdf,
+        Path(ruta_foto),
+        x=x,
+        y=y,
+        ancho=ancho,
+        max_px=420,
+        con_marco=True,
+    )
 
 
 def _dibujar_ficha(
@@ -138,12 +179,14 @@ def _dibujar_ficha(
     pdf.set_line_width(0.5)
     pdf.rect(15, 18, 180, 250)
 
-    pdf.set_xy(20, 24)
+    tiene_logo = _dibujar_logo(pdf, x=20, y=22, ancho=18)
+    titulo_x = 42 if tiene_logo else 20
+    pdf.set_xy(titulo_x, 24)
     pdf.set_font("Helvetica", "B", 18)
     pdf.set_text_color(20, 40, 80)
     pdf.cell(0, 10, _texto_pdf("Ficha del animal"), new_x="LMARGIN", new_y="NEXT")
 
-    pdf.set_x(20)
+    pdf.set_x(titulo_x)
     pdf.set_font("Helvetica", size=10)
     pdf.set_text_color(100, 100, 100)
     pdf.cell(
@@ -233,7 +276,15 @@ def _seccion_lista(
 
 def _portada(pdf: PdfFichas, total: int) -> None:
     pdf.add_page()
-    pdf.set_y(80)
+    # Logo centrado encima del título (si existe refugio.png / .jpg).
+    logo = ruta_logo_refugio()
+    if logo is not None:
+        ancho_logo = 42.0
+        x_logo = (210.0 - ancho_logo) / 2.0
+        _dibujar_logo(pdf, x=x_logo, y=40, ancho=ancho_logo)
+        pdf.set_y(90)
+    else:
+        pdf.set_y(80)
     pdf.set_font("Helvetica", "B", 22)
     pdf.set_text_color(20, 40, 80)
     pdf.cell(0, 12, _texto_pdf("Refugio Animal"), align="C", new_x="LMARGIN", new_y="NEXT")
@@ -309,5 +360,39 @@ def exportar_fichas_pdf(
         _dibujar_ficha(pdf, animal_id, registro)
 
     destino.parent.mkdir(parents=True, exist_ok=True)
-    pdf.output(str(destino))
+    # Escritura vía temporal: si el PDF destino está abierto en un visor,
+    # Windows suele devolver Permission denied al sobrescribirlo.
+    temporal = destino.with_name(
+        f".{destino.stem}_{os.getpid()}.pdf.tmp"
+    )
+    try:
+        pdf.output(str(temporal))
+        try:
+            temporal.replace(destino)
+        except PermissionError as error:
+            try:
+                temporal.unlink(missing_ok=True)
+            except OSError:
+                pass
+            raise PermissionError(
+                f"No se pudo guardar '{destino.name}'.\n\n"
+                "El archivo está bloqueado (normalmente porque ya está abierto "
+                "en un visor de PDF o en el explorador).\n\n"
+                "Cierra ese PDF e inténtalo de nuevo, o elige otro nombre "
+                "o carpeta en el diálogo Guardar."
+            ) from error
+    except PermissionError:
+        raise
+    except OSError as error:
+        try:
+            temporal.unlink(missing_ok=True)
+        except OSError:
+            pass
+        if getattr(error, "errno", None) == 13 or "Permission" in str(error):
+            raise PermissionError(
+                f"No se pudo guardar '{destino.name}'.\n\n"
+                "Permiso denegado al escribir el archivo. Comprueba que no "
+                "esté abierto en otro programa y que la carpeta sea escribible."
+            ) from error
+        raise
     return len(animales)

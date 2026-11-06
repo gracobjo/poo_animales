@@ -28,7 +28,7 @@ Toda la documentación vive en la carpeta [`docs/`](docs/). Empieza por esta tab
 | Añadir una especie nueva (ej. loro) | [Manual, sección 7](docs/manual_desarrollador.md#7-cómo-añadir-una-especie) |
 | Ejecutar la demo o los tests | [Instrucciones de ejecución](#instrucciones-de-ejecución) más abajo |
 | Probar la API con Swagger | [API HTTP y Swagger](docs/api_swagger.md) · [sección abajo](#api-http-opcional-swagger) |
-| Tarea 1 (programa Tkinter + defensa) | Ejecutar: `python tarea1/app.py` · [tarea1/](tarea1/) · [docs](tarea1/docs/README.md) · [cuaderno](gestion_animales_tkinter.ipynb) |
+| Tarea 1 (programa Tkinter + defensa) | GUI completa: `python tarea1/app.py` · [tarea1/](tarea1/) · [docs](tarea1/docs/README.md) · [cuaderno didáctico](gestion_animales_tkinter.ipynb) (GUI reducida; ver [diferencias](tarea1/README.md#cuaderno-vs-programa-apppy--mainpy)) |
 | Ver un ejemplo de código mínimo | [Ejemplo de uso](#ejemplo-de-uso) más abajo |
 
 ### Índice de documentos

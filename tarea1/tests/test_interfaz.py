@@ -75,6 +75,36 @@ class TestGestorAnimales(unittest.TestCase):
     def test_titulo_ventana(self) -> None:
         self.assertIn("Refugio Animal", self.raiz.title())
 
+    def test_logo_cabecera_si_existe_recurso(self) -> None:
+        from datos.recursos import ruta_logo_refugio
+
+        logo = ruta_logo_refugio()
+        if logo is None:
+            self.skipTest("No hay refugio.png / refugio.jpg")
+        self.assertIsNotNone(self.gestor._logo_tk)
+
+    def test_desplegable_incluye_especies_del_catalogo(self) -> None:
+        valores = self.gestor.combo_especie.cget("values")
+        self.assertIn("Perro", valores)
+        self.assertIn("Gato", valores)
+
+    def test_abrir_gestion_especies_crea_toplevel(self) -> None:
+        dialogo = None
+        try:
+            self.gestor._abrir_gestion_especies()
+            hijos = [
+                w
+                for w in self.raiz.winfo_children()
+                if w.winfo_class() == "Toplevel"
+                or w.__class__.__name__ == "DialogoGestionEspecies"
+            ]
+            self.assertTrue(hijos)
+            dialogo = hijos[-1]
+            self.assertIn("especies", str(dialogo.title()).casefold())
+        finally:
+            if dialogo is not None:
+                dialogo.destroy()
+
     def test_observaciones_usa_fuente_de_la_guia(self) -> None:
         """El Text no debe quedarse con la monoespaciada por defecto."""
         real = tkfont.Font(font=self.gestor.observaciones_text.cget("font"))
@@ -179,6 +209,100 @@ class TestGestorAnimales(unittest.TestCase):
             self.gestor.observaciones_text.get("1.0", "end-1c"),
         )
         self.assertIn("2", self.gestor.estado_var.get())
+
+    def test_ficha_poo_vacia_al_inicio(self) -> None:
+        self.assertIn(
+            "Selecciona un animal",
+            self.gestor.ficha_aviso_var.get(),
+        )
+        self.assertEqual(
+            self.gestor._leer_texto_ficha(self.gestor.lbl_ficha_generales), ""
+        )
+
+    def test_seleccionar_actualiza_ficha_poo(self) -> None:
+        self.gestor.tabla.selection_set("2")
+        self.gestor._seleccionar()
+        generales = self.gestor._leer_texto_ficha(self.gestor.lbl_ficha_generales)
+        self.assertIn("Misi", generales)
+        self.assertIn("Gato", generales)
+        self.assertIn(
+            "Miau",
+            self.gestor._leer_texto_ficha(self.gestor.txt_ficha_comportamiento),
+        )
+        self.assertEqual(
+            self.gestor._leer_texto_ficha(self.gestor.txt_ficha_alimentacion),
+            "carnívoro",
+        )
+        self.assertIn(
+            "arenero",
+            self.gestor._leer_texto_ficha(self.gestor.txt_ficha_cuidados).casefold(),
+        )
+
+    def test_seleccionar_otro_animal_cambia_ficha_poo(self) -> None:
+        self.gestor.tabla.selection_set("2")
+        self.gestor._seleccionar()
+        self.assertIn(
+            "Miau",
+            self.gestor._leer_texto_ficha(self.gestor.txt_ficha_comportamiento),
+        )
+
+        self.gestor.tabla.selection_set("1")
+        self.gestor._seleccionar()
+        self.assertIn(
+            "Guau",
+            self.gestor._leer_texto_ficha(self.gestor.txt_ficha_comportamiento),
+        )
+        self.assertIn(
+            "Luna",
+            self.gestor._leer_texto_ficha(self.gestor.lbl_ficha_generales),
+        )
+        self.assertIn(
+            "paseos",
+            self.gestor._leer_texto_ficha(self.gestor.txt_ficha_cuidados).casefold(),
+        )
+
+    def test_limpiar_restaura_ficha_poo_vacia(self) -> None:
+        self.gestor.tabla.selection_set("1")
+        self.gestor._seleccionar()
+        self.gestor._limpiar()
+        self.assertIn(
+            "Selecciona un animal",
+            self.gestor.ficha_aviso_var.get(),
+        )
+        self.assertEqual(
+            self.gestor._leer_texto_ficha(self.gestor.lbl_ficha_generales), ""
+        )
+
+    def test_secciones_ficha_con_scrollbar(self) -> None:
+        for widget in (
+            self.gestor.txt_ficha_comportamiento,
+            self.gestor.txt_ficha_alimentacion,
+            self.gestor.txt_ficha_cuidados,
+        ):
+            with self.subTest(widget=str(widget)):
+                self.assertIsInstance(widget, tk.Text)
+                self.assertTrue(str(widget.cget("yscrollcommand")))
+
+    def test_ficha_poo_error_especie_desconocida(self) -> None:
+        self.inventario[99] = {
+            "nombre": "Dragón",
+            "especie": "Dragón",
+            "edad": 1,
+            "peso": 1.0,
+            "color": "Rojo",
+            "observaciones": "",
+            "tratamientos": [],
+            "vacunaciones": [],
+            "documentos": [],
+            "foto": None,
+        }
+        self.gestor._actualizar_tabla()
+        self.gestor.tabla.selection_set("99")
+        self.gestor._seleccionar()
+        self.assertIn(
+            "No se pudo generar la ficha POO",
+            self.gestor.ficha_aviso_var.get(),
+        )
 
     # --- crear ---
 

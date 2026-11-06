@@ -9,6 +9,26 @@
 
 El cuaderno `../gestion_animales_tkinter.ipynb` se usa como **defensa y documentación** paso a paso. El programa real son los `.py` de esta carpeta.
 
+### Cuaderno vs programa (`app.py` / `main.py`)
+
+Las dos interfaces **no son idénticas**. El cuaderno enseña el núcleo; la entrega es `tarea1/`.
+
+| Aspecto | Cuaderno (`gestion_animales_tkinter.ipynb`) | Programa (`python app.py` o `main.py`) |
+| --- | --- | --- |
+| Rol | Guion didáctico / defensa | Entrega ejecutable |
+| Código | Celdas autocontenidas | Módulos (`interfaz/gestor.py`, …) |
+| CRUD + filtros + tabla | Sí | Sí |
+| Panel ficha POO (`generar_ficha`) | Sí (versión compacta) | Sí |
+| Scrollbars en ficha (comportamiento / alimentación / cuidados) | Sí | Sí |
+| Especies personalizadas (`EspeciePersonalizada`) | Demo en celdas (+ JSON simple opcional) | Completo: *Gestionar especies* + JSON |
+| Miniatura de foto en el formulario | No | Sí |
+| Botón ficha clínica / adjuntos | No | Sí |
+| Exportar PDF | No | Sí |
+| Estilos / tipografía (`estilos.py`) | Básicos de ttk | Tema completo |
+| Título de ventana | *…(demo cuaderno)* | *Refugio Animal - Gestión de animales* |
+
+Para enseñar conceptos: el cuaderno. Para demostrar la entrega: **`cd tarea1` → `python app.py`** (o `python main.py`).
+
 ## Cómo ejecutar el programa
 
 Desde esta carpeta:
@@ -81,9 +101,13 @@ tarea1/
 │   ├── inventario.py      # animales_iniciales + CRUD
 │   ├── ficha.py           # Tratamientos, vacunas, docs, foto
 │   ├── adjuntos.py        # Copia de archivos a adjuntos/
-│   ├── modelos.py         # ABC AnimalRefugio + herencia / @property
+│   ├── modelos.py         # ABC AnimalRefugio + EspeciePersonalizada
 │   ├── decoradores.py     # Decorador propio @cuenta_usos
-│   └── adaptador_poo.py   # Puente dict ↔ objeto
+│   ├── adaptador_poo.py   # Puente dict ↔ objeto
+│   ├── gestor_especies.py # Catálogo nativas + personalizadas
+│   ├── especies_personalizadas.json
+│   └── recursos.py        # Logo refugio.png / .jpg
+├── refugio.jpg            # (o refugio.png) logo GUI + PDF
 ├── validaciones/
 │   ├── __init__.py
 │   └── reglas.py          # validar_datos()
@@ -91,6 +115,7 @@ tarea1/
 │   ├── __init__.py
 │   ├── estilos.py         # Guía de tipografía / ttk.Style
 │   ├── gestor.py          # clase GestorAnimales (Tkinter)
+│   ├── dialogo_especies.py# Gestionar especies (Toplevel)
 │   └── ficha_clinica.py   # Diálogo clínica / adjuntos
 ├── exportacion/
 │   ├── __init__.py
@@ -152,4 +177,52 @@ Los datos siguen en un **diccionario en memoria** (sin base de datos), como pide
 
 ### Capa POO (Tema 2) sin romper el enunciado
 
-El inventario sigue siendo un **diccionario**. Las clases demuestran herencia / encapsulación y se enlazan con `adaptador_poo.py`. Al seleccionar un animal, la barra de estado muestra un resumen polimórfico (`hacer_sonido`, alimentación).
+El inventario sigue siendo un **diccionario**. Las clases demuestran herencia / encapsulación y se enlazan con `adaptador_poo.py`. Al seleccionar un animal, el panel **Información del animal seleccionado** muestra la ficha generada por el objeto (`generar_ficha()`), y la barra de estado mantiene un resumen breve.
+
+## Aplicación práctica de la programación orientada a objetos
+
+En esta fase la POO no es solo un ejemplo aislado: los objetos **proporcionan** la información específica de cada especie que muestra Tkinter.
+
+| Principio | Cómo se ve en el proyecto |
+| --- | --- |
+| **Herencia** | `Perro`, `Gato`, `Conejo`, `Loro` y `Hamster` heredan de `AnimalRefugio`. |
+| **Encapsulación** | `@property` / setters validan nombre, edad, peso, color y observaciones. |
+| **Abstracción** | `AnimalRefugio` define el contrato (`hacer_sonido`, `tipo_alimentacion`, `cuidados_especificos`) y ensambla `generar_ficha()`. |
+| **Polimorfismo** | La interfaz llama los mismos métodos; cada especie responde distinto (sonido, alimentación, cuidados). |
+
+**Recorrido de los datos al seleccionar una fila:**
+
+`Diccionario del inventario` → `registro_a_animal()` (adaptador) → objeto de la especie → `generar_ficha()` → panel Tkinter (*Datos generales*, *Comportamiento*, *Alimentación*, *Cuidados específicos*).
+
+Las tres últimas secciones usan `Text` con **barra de desplazamiento** para textos largos (típico en especies personalizadas).
+
+La interfaz **no** usa `if especie == "Perro"`: solo presenta las secciones que devuelve el objeto.
+
+Los objetos son **representaciones temporales** para consultar la ficha. El CRUD, la persistencia conceptual y el inventario en memoria siguen basados en diccionarios.
+
+## Gestión dinámica de especies y programación orientada a objetos
+
+Puedes ampliar el catálogo **desde Tkinter** (botón *Gestionar especies*) sin editar código Python.
+
+| Tipo | Ejemplos | Representación |
+| --- | --- | --- |
+| **Nativas** | Perro, Gato, Conejo, Loro, Hámster | Clases propias en `datos/modelos.py` |
+| **Personalizadas** | Hurón, Tortuga, … | Una sola clase `EspeciePersonalizada` + JSON |
+
+`EspeciePersonalizada` hereda de `AnimalRefugio` e implementa sonido, alimentación y cuidados con los textos configurados en el formulario. **No** se generan clases nuevas ni se usa `eval()`: el polimorfismo basta (mismo contrato, distinta configuración).
+
+Persistencia: `datos/especies_personalizadas.json` (UTF-8). El inventario de animales sigue en diccionarios en memoria.
+
+```text
+Usuario
+  → Ventana Tkinter: Gestionar especies
+  → CatalogoEspecies (datos/gestor_especies.py)
+  → especies_personalizadas.json
+  → Combobox del formulario de animales
+  → Registro dict en el inventario
+  → registro_a_animal() (adaptador)
+  → AnimalRefugio / EspeciePersonalizada
+  → Panel ficha dinámica (generar_ficha)
+```
+
+Desactivar una especie personalizada impide nuevas altas pero permite seguir consultando animales ya registrados. Eliminar solo es posible si ningún animal la usa.

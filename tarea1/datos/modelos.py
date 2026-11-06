@@ -20,7 +20,7 @@ class AnimalRefugio(ABC):
 
     Atributos protegidos (``_nombre``, ``_edad``, …) con acceso público
     mediante getters/setters ``@property``. Cada subclase fija ``ESPECIE``
-    e implementa sonido y alimentación (polimorfismo).
+    e implementa sonido, alimentación y cuidados (polimorfismo).
     """
 
     ESPECIE: str = ""
@@ -132,6 +132,37 @@ class AnimalRefugio(ABC):
     def tipo_alimentacion(self) -> str:
         """Tipo de alimentación de la especie."""
 
+    @abstractmethod
+    def cuidados_especificos(self) -> str:
+        """Orientaciones generales de cuidado de la especie (no son consejo veterinario)."""
+
+    def generar_ficha(self) -> Dict[str, str]:
+        """Ficha informativa construida con propiedades y métodos polimórficos.
+
+        La clase base ensambla las secciones; las subclases aportan el contenido
+        específico mediante ``hacer_sonido``, ``tipo_alimentacion`` y
+        ``cuidados_especificos``.
+
+        Returns:
+            Diccionario con las claves ``generales``, ``comportamiento``,
+            ``alimentacion`` y ``cuidados`` para que la interfaz las muestre
+            sin conocer la especie concreta.
+        """
+        observaciones = self.observaciones or "(sin observaciones)"
+        return {
+            "generales": (
+                f"Nombre: {self.nombre}\n"
+                f"Especie: {self.especie}\n"
+                f"Edad: {self.edad} años\n"
+                f"Peso: {self.peso:.2f} kg\n"
+                f"Color: {self.color}\n"
+                f"Observaciones: {observaciones}"
+            ),
+            "comportamiento": self.hacer_sonido(),
+            "alimentacion": self.tipo_alimentacion(),
+            "cuidados": self.cuidados_especificos(),
+        }
+
     @classmethod
     def campos_desde_dict(cls, datos: Dict[str, Any]) -> Dict[str, Any]:
         """Factory auxiliar: extrae kwargs comunes desde un ``dict`` de ficha."""
@@ -161,6 +192,14 @@ class Perro(AnimalRefugio):
     def tipo_alimentacion(self) -> str:
         return "omnívoro"
 
+    def cuidados_especificos(self) -> str:
+        return (
+            "Necesita paseos y ejercicio diario, contacto social y un entorno "
+            "seguro. Mantén higiene básica (cepillado según el pelaje) y "
+            "enriquecimiento con juguetes o juegos. Ante cambios de conducta "
+            "o de salud, consulta a un profesional veterinario."
+        )
+
 
 class Gato(AnimalRefugio):
     """Gato del refugio."""
@@ -172,6 +211,14 @@ class Gato(AnimalRefugio):
 
     def tipo_alimentacion(self) -> str:
         return "carnívoro"
+
+    def cuidados_especificos(self) -> str:
+        return (
+            "Requiere arenero limpio, zonas de descanso elevadas y "
+            "oportunidades de rascado y juego. Respeta su necesidad de "
+            "tranquilidad y ofrece enriquecimiento ambiental. Cualquier "
+            "síntoma o duda debe valorarla un veterinario."
+        )
 
 
 class Conejo(AnimalRefugio):
@@ -185,6 +232,14 @@ class Conejo(AnimalRefugio):
     def tipo_alimentacion(self) -> str:
         return "herbívoro"
 
+    def cuidados_especificos(self) -> str:
+        return (
+            "Precisa espacio para moverse y saltar, un entorno limpio y "
+            "acceso habitual a heno de buena calidad como base de la dieta. "
+            "Evita corrientes fuertes y manipúlalo con calma. Para "
+            "alimentación o salud, pide orientación veterinaria especializada."
+        )
+
 
 class Loro(AnimalRefugio):
     """Loro del refugio."""
@@ -197,6 +252,14 @@ class Loro(AnimalRefugio):
     def tipo_alimentacion(self) -> str:
         return "granívoro"
 
+    def cuidados_especificos(self) -> str:
+        return (
+            "Necesita interacción social, estímulos mentales y un alojamiento "
+            "amplio con perchas y juguetes seguros. Mantén higiene del "
+            "entorno y evita humos o corrientes. Ante cambios de plumaje, "
+            "apetito o comportamiento, consulta a un veterinario de aves."
+        )
+
 
 class Hamster(AnimalRefugio):
     """Hámster del refugio."""
@@ -208,6 +271,70 @@ class Hamster(AnimalRefugio):
 
     def tipo_alimentacion(self) -> str:
         return "omnívoro"
+
+    def cuidados_especificos(self) -> str:
+        return (
+            "Es mayoritariamente nocturno: ofrece jaula segura, rueda adecuada, "
+            "material para esconderse y un entorno tranquilo de día. Manipúlalo "
+            "con suavidad y limpia el hábitat con regularidad. Ante dudas de "
+            "salud, acude a un veterinario de animales exóticos."
+        )
+
+
+class EspeciePersonalizada(AnimalRefugio):
+    """Animal de una especie definida por el usuario (sin clase Python propia).
+
+    Los comportamientos (sonido, alimentación, cuidados) llegan por
+    configuración; la GUI y el adaptador usan el mismo contrato
+    ``AnimalRefugio`` que las especies nativas.
+    """
+
+    ESPECIE = ""  # las nativas fijan ESPECIE de clase; aquí va por instancia
+
+    def __init__(
+        self,
+        nombre: str,
+        edad: int,
+        peso: float,
+        color: str,
+        observaciones: str = "",
+        *,
+        nombre_especie: str,
+        sonido: str,
+        alimentacion: str,
+        cuidados: str,
+    ) -> None:
+        nombre_especie = str(nombre_especie or "").strip()
+        sonido = str(sonido or "").strip()
+        alimentacion = str(alimentacion or "").strip()
+        cuidados = str(cuidados or "").strip()
+        if not nombre_especie:
+            raise ValueError("El nombre de la especie personalizada es obligatorio.")
+        if not sonido:
+            raise ValueError("La descripción del sonido es obligatoria.")
+        if not alimentacion:
+            raise ValueError("El tipo de alimentación es obligatorio.")
+        if not cuidados:
+            raise ValueError("Los cuidados específicos son obligatorios.")
+        self._nombre_especie = nombre_especie
+        self._sonido = sonido
+        self._alimentacion = alimentacion
+        self._cuidados = cuidados
+        super().__init__(nombre, edad, peso, color, observaciones)
+
+    @property
+    def especie(self) -> str:
+        """Nombre configurado de la especie personalizada."""
+        return self._nombre_especie
+
+    def hacer_sonido(self) -> str:
+        return f"{self.nombre}: {self._sonido}"
+
+    def tipo_alimentacion(self) -> str:
+        return self._alimentacion
+
+    def cuidados_especificos(self) -> str:
+        return self._cuidados
 
 
 CLASES_POR_ESPECIE: Dict[str, Type[AnimalRefugio]] = {

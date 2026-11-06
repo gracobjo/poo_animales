@@ -14,13 +14,15 @@ CRUD Tkinter sobre diccionarios, con ficha clínica, adjuntos, portapapeles, PDF
 | --- | --- | --- |
 | Arranque | `app.py`, `main.py` | `Tk`, inventario, `mainloop` |
 | Presentación | `interfaz/` | GUI, estilos, ficha clínica, portapapeles, miniatura |
-| Dominio | `datos/` | Constantes, inventario CRUD, ficha clínica, adjuntos, **modelos POO** |
+| Dominio | `datos/` | Constantes, inventario CRUD, ficha clínica, adjuntos, **modelos POO**, **catálogo de especies** |
 | Reglas | `validaciones/reglas.py` | `validar_datos` (+ listas clínicas) |
 | Exportación | `exportacion/pdf_fichas.py` | PDF por animal |
 | Pruebas | `tests/`, `ejecutar_tests.py` | unittest + informes |
 | Muestras | `muestras/` | Fotos/PDF/DOCX de demo |
 
-El cuaderno `gestion_animales_tkinter.ipynb` es **defensa/documentación**, no el ejecutable.
+El cuaderno `../gestion_animales_tkinter.ipynb` es **defensa/documentación**, no el ejecutable.
+
+La GUI del cuaderno **no coincide** con `app.py` / `main.py`: es una versión reducida (CRUD + panel POO) para explicar el flujo en celdas. La interfaz de entrega (`interfaz/gestor.py`) añade foto, ficha clínica, PDF, estilos y el mismo panel POO. Tabla comparativa: [../README.md](../README.md#cuaderno-vs-programa-apppy--mainpy).
 
 **Principio de defensa:** la lógica vive fuera de Tkinter. Si el tribunal pide un cambio de regla, casi siempre se responde en `validaciones/` o `datos/`; si pide un cambio visual, en `interfaz/`.
 
@@ -280,8 +282,12 @@ No meter I/O dentro de `validar_datos`.
 | Decoradores stdlib | `@abstractmethod`, `@classmethod`, `@property` |
 | Decorador propio | `@cuenta_usos` en `datos/decoradores.py` (usado en `info_basica`) |
 | Adaptador | `registro_a_animal` / `animal_a_campos` / `resumen_polimorfico` |
-| Uso en GUI | Al seleccionar fila → barra de estado con sonido y alimentación |
-| Tests | `tests/test_modelos_poo.py` |
+| Ficha POO | `cuidados_especificos()` + `generar_ficha()` en `AnimalRefugio` |
+| Especies personalizadas | `EspeciePersonalizada` + `gestor_especies.py` + `especies_personalizadas.json` |
+| Uso en GUI | Panel ficha POO; botón *Gestionar especies* (`dialogo_especies.py`); combos refrescan el catálogo |
+| Textos largos en ficha | `Text` + scrollbar en *Comportamiento*, *Alimentación* y *Cuidados* (`gestor.py`) |
+| Logo del refugio | `datos/recursos.py` → `refugio.png` / `.jpg` en cabecera Tkinter y PDF (`pdf_fichas.py`) |
+| Tests | `tests/test_modelos_poo.py`, `tests/test_gestor_especies.py`, ficha/especies en `tests/test_interfaz.py` |
 
 **Nueva especie con clase**
 

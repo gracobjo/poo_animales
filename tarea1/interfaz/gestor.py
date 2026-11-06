@@ -6,8 +6,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from typing import Any, Dict, List, Optional
 
-from datos.adaptador_poo import resumen_polimorfico
-from datos.constantes import ESPECIES
+from datos.adaptador_poo import registro_a_animal, resumen_polimorfico
+from datos.gestor_especies import get_catalogo
 from datos.inventario import (
     actualizar_animal,
     borrar_animal,
@@ -15,6 +15,8 @@ from datos.inventario import (
     leer_animal,
 )
 from datos.ficha import asegurar_campos_clinicos
+from datos.recursos import ruta_logo_refugio
+from interfaz.dialogo_especies import DialogoGestionEspecies
 from interfaz.estilos import aplicar_tema, configurar_texto
 from interfaz.ficha_clinica import DialogoFichaClinica
 from interfaz.vista_foto import cargar_miniatura
@@ -26,8 +28,10 @@ class GestorAnimales:
     def __init__(self, raiz: tk.Tk, inventario: Dict[int, Dict[str, Any]]) -> None:
         self.raiz = raiz
         self.inventario = inventario
+        self.catalogo = get_catalogo()
+        especies_alta = self.catalogo.nombres_activos_para_alta()
         self.nombre_var = tk.StringVar()
-        self.especie_var = tk.StringVar(value=ESPECIES[0])
+        self.especie_var = tk.StringVar(value=especies_alta[0])
         self.edad_var = tk.StringVar()
         self.peso_var = tk.StringVar()
         self.color_var = tk.StringVar()
@@ -37,28 +41,40 @@ class GestorAnimales:
             value="Selecciona un animal o completa el formulario."
         )
         self._foto_tk = None  # referencia para que el GC no borre la imagen
+        self._logo_tk = None  # referencia al logo del encabezado
+        self._mensaje_ficha_vacia = (
+            "Selecciona un animal de la tabla para consultar su ficha."
+        )
 
         self.raiz.title("Refugio Animal - Gestión de animales")
-        self.raiz.geometry("1180x780")
-        self.raiz.minsize(960, 660)
+        self.raiz.geometry("1180x820")
+        self.raiz.minsize(960, 700)
         aplicar_tema(self.raiz)
         self._crear_controles()
         self._actualizar_tabla()
         self._mostrar_foto_formulario(None)
+        self._mostrar_ficha_vacia()
 
     def _crear_controles(self) -> None:
         """Construye el formulario, los filtros y la tabla."""
         contenedor = ttk.Frame(self.raiz, padding=12)
         contenedor.pack(fill="both", expand=True)
 
+        cabecera = ttk.Frame(contenedor)
+        cabecera.pack(fill="x", pady=(0, 10))
+        self.lbl_logo = ttk.Label(cabecera)
+        self.lbl_logo.pack(side="left", padx=(0, 12))
+        self._mostrar_logo_cabecera()
+        textos = ttk.Frame(cabecera)
+        textos.pack(side="left", fill="x", expand=True)
         ttk.Label(
-            contenedor, text="Refugio Animal", style="Titulo.TLabel"
+            textos, text="Refugio Animal", style="Titulo.TLabel"
         ).pack(anchor="w")
         ttk.Label(
-            contenedor,
+            textos,
             text="Registro de animales del refugio (dict + capa POO)",
             style="Subtitulo.TLabel",
-        ).pack(anchor="w", pady=(0, 10))
+        ).pack(anchor="w")
 
         zona_datos = ttk.Frame(contenedor)
         zona_datos.pack(fill="x", pady=(0, 10))
@@ -96,12 +112,13 @@ class GestorAnimales:
         ttk.Label(formulario, text="Especie:").grid(
             row=0, column=2, sticky="w", padx=5, pady=4
         )
-        ttk.Combobox(
+        self.combo_especie = ttk.Combobox(
             formulario,
             textvariable=self.especie_var,
-            values=ESPECIES,
+            values=self.catalogo.nombres_activos_para_alta(),
             state="readonly",
-        ).grid(row=0, column=3, sticky="ew", padx=5, pady=4)
+        )
+        self.combo_especie.grid(row=0, column=3, sticky="ew", padx=5, pady=4)
 
         ttk.Label(formulario, text="Edad (0-30):").grid(
             row=1, column=0, sticky="w", padx=5, pady=4
@@ -153,6 +170,11 @@ class GestorAnimales:
             text="Ficha clínica / adjuntos",
             command=self._abrir_ficha_clinica,
         ).pack(side="left", padx=3)
+        ttk.Button(
+            botones,
+            text="Gestionar especies",
+            command=self._abrir_gestion_especies,
+        ).pack(side="left", padx=3)
 
         filtros = ttk.LabelFrame(contenedor, text="Buscar y filtrar", padding=8)
         filtros.pack(fill="x", pady=(0, 8))
@@ -161,18 +183,99 @@ class GestorAnimales:
         busqueda.pack(side="left", padx=(0, 14))
         busqueda.bind("<KeyRelease>", lambda evento: self._actualizar_tabla())
         ttk.Label(filtros, text="Especie:").pack(side="left", padx=(0, 5))
-        filtro = ttk.Combobox(
+        self.combo_filtro = ttk.Combobox(
             filtros,
             textvariable=self.filtro_var,
-            values=("Todas",) + ESPECIES,
+            values=("Todas",) + self.catalogo.nombres_para_filtro(),
             state="readonly",
             width=14,
         )
-        filtro.pack(side="left")
-        filtro.bind(
+        self.combo_filtro.pack(side="left")
+        self.combo_filtro.bind(
             "<<ComboboxSelected>>",
             lambda evento: self._actualizar_tabla(),
         )
+
+        ficha = ttk.LabelFrame(
+            contenedor,
+            text="Información del animal seleccionado",
+            padding=8,
+        )
+        ficha.pack(fill="x", pady=(0, 8))
+        self.ficha_aviso_var = tk.StringVar(value=self._mensaje_ficha_vacia)
+        self.lbl_ficha_aviso = ttk.Label(
+            ficha,
+            textvariable=self.ficha_aviso_var,
+            style="Subtitulo.TLabel",
+            wraplength=900,
+        )
+        self.lbl_ficha_aviso.pack(anchor="w", fill="x")
+
+        self.ficha_secciones = ttk.Frame(ficha)
+        self.ficha_secciones.columnconfigure(0, weight=1)
+        self.ficha_secciones.columnconfigure(1, weight=1)
+        self.ficha_secciones.rowconfigure(0, weight=0)
+        self.ficha_secciones.rowconfigure(1, weight=1)
+
+        def _bloque_etiqueta(
+            padre, titulo: str, fila: int, columna: int
+        ) -> ttk.Label:
+            marco = ttk.LabelFrame(padre, text=titulo, padding=6)
+            marco.grid(
+                row=fila,
+                column=columna,
+                sticky="nsew",
+                padx=4,
+                pady=4,
+            )
+            etiqueta = ttk.Label(marco, text="", wraplength=420, justify="left")
+            etiqueta.pack(anchor="nw", fill="both", expand=True)
+            return etiqueta
+
+        def _bloque_scroll(
+            padre, titulo: str, fila: int, columna: int, *, alto: int = 6
+        ) -> tk.Text:
+            """Área de texto de solo lectura con barra vertical (textos largos)."""
+            marco = ttk.LabelFrame(padre, text=titulo, padding=6)
+            marco.grid(
+                row=fila,
+                column=columna,
+                sticky="nsew",
+                padx=4,
+                pady=4,
+            )
+            marco.rowconfigure(0, weight=1)
+            marco.columnconfigure(0, weight=1)
+            texto = tk.Text(
+                marco,
+                height=alto,
+                wrap="word",
+                relief="flat",
+                borderwidth=0,
+            )
+            configurar_texto(texto)
+            barra = ttk.Scrollbar(marco, orient="vertical", command=texto.yview)
+            texto.configure(yscrollcommand=barra.set, state="disabled")
+            texto.grid(row=0, column=0, sticky="nsew")
+            barra.grid(row=0, column=1, sticky="ns")
+            return texto
+
+        self.lbl_ficha_generales = _bloque_etiqueta(
+            self.ficha_secciones, "Datos generales", 0, 0
+        )
+        self.txt_ficha_comportamiento = _bloque_scroll(
+            self.ficha_secciones, "Comportamiento", 0, 1, alto=4
+        )
+        self.txt_ficha_alimentacion = _bloque_scroll(
+            self.ficha_secciones, "Alimentación", 1, 0, alto=4
+        )
+        self.txt_ficha_cuidados = _bloque_scroll(
+            self.ficha_secciones, "Cuidados específicos", 1, 1, alto=7
+        )
+        # Compatibilidad con tests / código que aún usen el nombre antiguo
+        self.lbl_ficha_comportamiento = self.txt_ficha_comportamiento
+        self.lbl_ficha_alimentacion = self.txt_ficha_alimentacion
+        self.lbl_ficha_cuidados = self.txt_ficha_cuidados
 
         tabla_marco = ttk.Frame(contenedor)
         tabla_marco.pack(fill="both", expand=True)
@@ -322,17 +425,24 @@ class GestorAnimales:
     def _seleccionar(self, evento=None) -> None:
         seleccion = self.tabla.selection()
         if not seleccion:
+            self._mostrar_ficha_vacia()
             return
         animal_id = int(seleccion[0])
         registro = leer_animal(animal_id, self.inventario)
         self.nombre_var.set(registro["nombre"])
-        self.especie_var.set(registro["especie"])
+        especie = registro["especie"]
+        valores = list(self.combo_especie.cget("values"))
+        if especie not in valores:
+            valores.append(especie)
+            self.combo_especie.configure(values=tuple(valores))
+        self.especie_var.set(especie)
         self.edad_var.set(str(registro["edad"]))
         self.peso_var.set(str(registro["peso"]))
         self.color_var.set(registro["color"])
         self.observaciones_text.delete("1.0", "end")
         self.observaciones_text.insert("1.0", registro["observaciones"])
         self._mostrar_foto_formulario(registro.get("foto"))
+        self._actualizar_ficha_poo(registro)
         n_trat = len(registro.get("tratamientos", []))
         n_vac = len(registro.get("vacunaciones", []))
         n_docs = len(registro.get("documentos", []))
@@ -347,6 +457,60 @@ class GestorAnimales:
             f"docs {n_docs}, foto {foto}"
         )
 
+    @staticmethod
+    def _poner_texto_ficha(widget: tk.Misc, contenido: str) -> None:
+        """Actualiza Label o Text de solo lectura en el panel de ficha."""
+        if isinstance(widget, tk.Text):
+            widget.configure(state="normal")
+            widget.delete("1.0", "end")
+            if contenido:
+                widget.insert("1.0", contenido)
+            widget.configure(state="disabled")
+        else:
+            widget.configure(text=contenido)
+
+    @staticmethod
+    def _leer_texto_ficha(widget: tk.Misc) -> str:
+        """Lee el contenido de un Label o Text del panel de ficha."""
+        if isinstance(widget, tk.Text):
+            return widget.get("1.0", "end-1c")
+        return str(widget.cget("text"))
+
+    def _mostrar_ficha_vacia(self) -> None:
+        """Estado inicial o sin selección: mensaje y secciones ocultas."""
+        self.ficha_aviso_var.set(self._mensaje_ficha_vacia)
+        self.lbl_ficha_aviso.pack(anchor="w", fill="x")
+        self.ficha_secciones.pack_forget()
+        self._poner_texto_ficha(self.lbl_ficha_generales, "")
+        self._poner_texto_ficha(self.txt_ficha_comportamiento, "")
+        self._poner_texto_ficha(self.txt_ficha_alimentacion, "")
+        self._poner_texto_ficha(self.txt_ficha_cuidados, "")
+
+    def _actualizar_ficha_poo(self, registro: Dict[str, Any]) -> None:
+        """Convierte el dict en objeto y muestra ``generar_ficha()`` (polimorfismo)."""
+        try:
+            animal = registro_a_animal(registro)
+            ficha = animal.generar_ficha()
+        except ValueError as error:
+            self.ficha_aviso_var.set(
+                "No se pudo generar la ficha POO de este registro: "
+                f"{error}"
+            )
+            self.lbl_ficha_aviso.pack(anchor="w", fill="x")
+            self.ficha_secciones.pack_forget()
+            return
+
+        self.lbl_ficha_aviso.pack_forget()
+        self.ficha_secciones.pack(fill="both", expand=True)
+        self._poner_texto_ficha(self.lbl_ficha_generales, ficha["generales"])
+        self._poner_texto_ficha(
+            self.txt_ficha_comportamiento, ficha["comportamiento"]
+        )
+        self._poner_texto_ficha(
+            self.txt_ficha_alimentacion, ficha["alimentacion"]
+        )
+        self._poner_texto_ficha(self.txt_ficha_cuidados, ficha["cuidados"])
+
     def _abrir_ficha_clinica(self) -> None:
         """Abre el diálogo de tratamientos, vacunas, documentos y foto."""
         animal_id = self._id_seleccionado()
@@ -360,6 +524,33 @@ class GestorAnimales:
             al_guardar=lambda: self._tras_cambio_clinico(animal_id),
         )
 
+    def _abrir_gestion_especies(self) -> None:
+        """Abre la ventana de catálogo de especies (nativas + personalizadas)."""
+        DialogoGestionEspecies(
+            self.raiz,
+            self.inventario,
+            catalogo=self.catalogo,
+            al_cambiar=self._refrescar_desplegables_especies,
+        )
+
+    def _refrescar_desplegables_especies(self) -> None:
+        """Actualiza combos de alta y filtro tras cambios en el catálogo."""
+        altas = self.catalogo.nombres_activos_para_alta()
+        actual = self.especie_var.get()
+        valores_alta = list(altas)
+        if actual and actual not in valores_alta:
+            valores_alta.append(actual)
+        self.combo_especie.configure(values=tuple(valores_alta))
+        if self.especie_var.get() not in valores_alta and altas:
+            self.especie_var.set(altas[0])
+
+        filtro_actual = self.filtro_var.get()
+        valores_filtro = ("Todas",) + self.catalogo.nombres_para_filtro()
+        self.combo_filtro.configure(values=valores_filtro)
+        if filtro_actual not in valores_filtro:
+            self.filtro_var.set("Todas")
+        self._actualizar_tabla()
+
     def _tras_cambio_clinico(self, animal_id: int) -> None:
         if animal_id in self.inventario:
             self._mostrar_foto_formulario(self.inventario[animal_id].get("foto"))
@@ -369,6 +560,19 @@ class GestorAnimales:
             self.estado_var.set(
                 f"Ficha clínica del registro {animal_id} actualizada."
             )
+
+    def _mostrar_logo_cabecera(self) -> None:
+        """Muestra ``refugio.png`` / ``.jpg`` en la cabecera si está disponible."""
+        logo = ruta_logo_refugio()
+        if logo is None:
+            self.lbl_logo.configure(image="", text="")
+            return
+        imagen, _mensaje = cargar_miniatura(str(logo), max_lado=72)
+        self._logo_tk = imagen
+        if imagen is not None:
+            self.lbl_logo.configure(image=imagen, text="")
+        else:
+            self.lbl_logo.configure(image="", text="")
 
     def _mostrar_foto_formulario(self, ruta: Optional[str]) -> None:
         """Actualiza la miniatura del panel Foto del formulario principal."""
@@ -381,7 +585,9 @@ class GestorAnimales:
 
     def _limpiar(self) -> None:
         self.nombre_var.set("")
-        self.especie_var.set(ESPECIES[0])
+        altas = self.catalogo.nombres_activos_para_alta()
+        self.combo_especie.configure(values=altas)
+        self.especie_var.set(altas[0] if altas else "")
         self.edad_var.set("")
         self.peso_var.set("")
         self.color_var.set("")
@@ -390,6 +596,7 @@ class GestorAnimales:
         seleccion = self.tabla.selection()
         if seleccion:
             self.tabla.selection_remove(seleccion)
+        self._mostrar_ficha_vacia()
 
     def _ids_visibles(self) -> List[int]:
         """IDs que aparecen ahora en la tabla (respetan búsqueda y filtro)."""
@@ -456,6 +663,12 @@ class GestorAnimales:
                 ids=ids,
                 incluir_portada=len(ids) > 1,
             )
+        except PermissionError as error:
+            messagebox.showerror(
+                "No se pudo exportar el PDF",
+                str(error),
+            )
+            return
         except Exception as error:  # noqa: BLE001 — mostrar cualquier fallo al usuario
             messagebox.showerror(
                 "No se pudo exportar el PDF",

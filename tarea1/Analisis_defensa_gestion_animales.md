@@ -8,8 +8,10 @@
 
 Este documento sirve para **explicar y defender** el trabajo ante el tribunal: qué hace, cómo está organizado, qué del temario se aplica y cómo responder a cambios de refactorización.
 
-**Arranque:** `cd tarea1` → `python app.py`  
-**Extras respecto al enunciado mínimo:** ficha clínica, foto/documentos (importar/pegar, máx. 5 MB), exportación PDF, tests con informe en disco.
+**Arranque (entrega):** `cd tarea1` → `python app.py` (o `python main.py`)  
+**Extras respecto al enunciado mínimo:** ficha clínica, foto/documentos (importar/pegar, máx. 5 MB), exportación PDF, ficha POO en la GUI, **especies personalizadas** (JSON + `EspeciePersonalizada`), tests con informe en disco.
+
+**Cuaderno ≠ programa.** El `.ipynb` es un guion didáctico (CRUD + ficha POO con scrollbars + demo de `EspeciePersonalizada`). La ventana completa (foto, clínica, PDF, *Gestionar especies*, estilos) solo sale de `tarea1/app.py`. Ver tabla en [README.md](README.md#cuaderno-vs-programa-apppy--mainpy).
 
 ---
 
@@ -58,8 +60,10 @@ El enunciado exige **diccionario + CRUD + Tkinter**. La ficha vive en un `dict`;
 | Herencia + ABC | `AnimalRefugio` (abstracta) → `Perro`, `Gato`, `Conejo`, `Loro`, `Hamster` en `datos/modelos.py` |
 | Getters / setters | `@property` + `@xxx.setter` (nombre, edad, peso, color, observaciones) |
 | Decoradores | `@abstractmethod`, `@property`, `@classmethod`, y propio `@cuenta_usos` en `datos/decoradores.py` |
-| Polimorfismo | `hacer_sonido()` / `tipo_alimentacion()` distintos por subclase; la barra de estado los muestra al seleccionar |
+| Polimorfismo | `hacer_sonido()` / `tipo_alimentacion()` / `cuidados_especificos()`; la GUI muestra `generar_ficha()` sin `if` por especie |
 | Puente dict ↔ objeto | `datos/adaptador_poo.py` (`registro_a_animal`, `animal_a_campos`) |
+| Ficha en Tkinter | Panel «Información del animal seleccionado»: dict → adaptador → objeto → `generar_ficha()`; scrollbars en comportamiento / alimentación / cuidados |
+| Especies dinámicas | Nativas (clases fijas) + personalizadas (`EspeciePersonalizada` + `especies_personalizadas.json`) vía *Gestionar especies* |
 | Validación procedural | `validar_datos()` sigue siendo la puerta del CRUD (coherente con los setters) |
 
 **Frase de defensa:** *«El CRUD trabaja con diccionarios, como pide el enunciado; la herencia y las properties son una capa didáctica conectada por un adaptador.»*
@@ -304,7 +308,8 @@ y en `_confirmar_salida` un `askyesno`.
 - [ ] Señalar módulos clave y diagramas en [docs/uml.md](docs/uml.md) / [docs/requisitos.md](docs/requisitos.md).  
 - [ ] Tener respuesta lista para “añadir especie” y “guardar en JSON”.  
 - [ ] Relacionar al menos 5 widgets con lecciones del Tema 3.  
-- [ ] Usar el cuaderno solo como guion de defensa / documentación.  
+- [ ] Usar el cuaderno solo como guion de defensa / documentación (no como sustituto de `app.py`).  
+- [ ] Si alguien ejecuta el notebook: aclarar que la GUI completa es `python app.py`.  
 - [ ] Conocer [docs/pruebas.md](docs/pruebas.md) y [docs/manual_usuario.md](docs/manual_usuario.md).
 
 ---

@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
-from datos.constantes import ESPECIES, PESO_MAX_KG, PESO_MIN_KG
+from datos.constantes import PESO_MAX_KG, PESO_MIN_KG
 from datos.ficha import (
     normalizar_documentos,
     normalizar_tratamientos,
@@ -13,15 +13,25 @@ from datos.ficha import (
 )
 
 
-def validar_datos(datos: Dict[str, Any]) -> Dict[str, Any]:
+def validar_datos(
+    datos: Dict[str, Any],
+    *,
+    especie_previa: Optional[str] = None,
+) -> Dict[str, Any]:
     """Comprueba los datos del formulario y devuelve un registro limpio.
 
     Incluye campos clínicos opcionales: foto, tratamientos, vacunaciones
     y documentos. Si no vienen en ``datos``, quedan vacíos.
 
+    La especie debe estar en el catálogo activo. Si ``especie_previa`` coincide
+    con la especie del registro (p. ej. al actualizar un animal de una especie
+    personalizada ya desactivada), se admite para no romper registros antiguos.
+
     Raises:
         ValueError: Si falta un campo obligatorio o un valor no es válido.
     """
+    from datos.gestor_especies import get_catalogo, normalizar_nombre
+
     nombre = str(datos.get("nombre", "")).strip()
     especie = str(datos.get("especie", "")).strip()
     color = str(datos.get("color", "")).strip()
@@ -31,8 +41,19 @@ def validar_datos(datos: Dict[str, Any]) -> Dict[str, Any]:
 
     if not nombre:
         raise ValueError("El nombre es obligatorio.")
-    if especie not in ESPECIES:
+    if not especie:
         raise ValueError("Selecciona una especie de la lista.")
+
+    catalogo = get_catalogo()
+    permitida = catalogo.especie_permitida_en_alta(especie)
+    misma_previa = (
+        especie_previa is not None
+        and normalizar_nombre(especie) == normalizar_nombre(especie_previa)
+        and catalogo.especie_conocida(especie)
+    )
+    if not permitida and not misma_previa:
+        raise ValueError("Selecciona una especie de la lista.")
+
     if not color:
         raise ValueError("El color es obligatorio.")
     if isinstance(edad, bool) or not isinstance(edad, int):

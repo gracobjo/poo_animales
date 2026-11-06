@@ -13,6 +13,7 @@ if str(RAIZ_PROGRAMA) not in sys.path:
     sys.path.insert(0, str(RAIZ_PROGRAMA))
 
 from datos.inventario import animales_iniciales  # noqa: E402
+from datos.recursos import ruta_logo_refugio  # noqa: E402
 from exportacion.pdf_fichas import exportar_fichas_pdf  # noqa: E402
 
 
@@ -21,17 +22,35 @@ class TestExportarFichasPdf(unittest.TestCase):
         self.inventario = animales_iniciales()
 
     def test_exporta_todas_las_fichas(self) -> None:
+        # Sin logo: el PDF debe seguir siendo muy ligero (fuentes estándar).
+        with patch(
+            "exportacion.pdf_fichas.ruta_logo_refugio", return_value=None
+        ):
+            with tempfile.TemporaryDirectory() as tmp:
+                ruta = Path(tmp) / "fichas.pdf"
+                total = exportar_fichas_pdf(self.inventario, ruta)
+                self.assertEqual(total, 4)
+                self.assertTrue(ruta.is_file())
+                tamaño = ruta.stat().st_size
+                self.assertGreater(tamaño, 500)
+                self.assertLess(tamaño, 20_000)
+                raw = ruta.read_bytes()
+                self.assertNotIn(b"/FontFile", raw)
+
+    def test_pdf_incluye_logo_si_existe(self) -> None:
+        logo = ruta_logo_refugio()
+        if logo is None:
+            self.skipTest("No hay refugio.png / refugio.jpg en tarea1/ o raíz")
         with tempfile.TemporaryDirectory() as tmp:
-            ruta = Path(tmp) / "fichas.pdf"
-            total = exportar_fichas_pdf(self.inventario, ruta)
-            self.assertEqual(total, 4)
-            self.assertTrue(ruta.is_file())
-            tamaño = ruta.stat().st_size
-            self.assertGreater(tamaño, 500)
-            # Sin TTF embebidas el PDF debe ser ligero (apertura rápida).
-            self.assertLess(tamaño, 20_000)
+            ruta = Path(tmp) / "con_logo.pdf"
+            exportar_fichas_pdf(
+                self.inventario, ruta, ids=[1], incluir_portada=True
+            )
             raw = ruta.read_bytes()
-            self.assertNotIn(b"/FontFile", raw)
+            self.assertTrue(
+                b"/XObject" in raw or b"/Image" in raw,
+                "El PDF debería embeber el logo del refugio",
+            )
 
     def test_exporta_solo_ids_indicados(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

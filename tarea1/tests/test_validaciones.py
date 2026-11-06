@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -10,6 +11,11 @@ RAIZ_PROGRAMA = Path(__file__).resolve().parents[1]
 if str(RAIZ_PROGRAMA) not in sys.path:
     sys.path.insert(0, str(RAIZ_PROGRAMA))
 
+from datos.gestor_especies import (  # noqa: E402
+    CatalogoEspecies,
+    reiniciar_catalogo_global,
+)
+import datos.gestor_especies as ge  # noqa: E402
 from validaciones.reglas import validar_datos  # noqa: E402
 
 
@@ -43,6 +49,47 @@ class TestValidarDatos(unittest.TestCase):
     def test_especie_invalida(self) -> None:
         with self.assertRaisesRegex(ValueError, "especie"):
             validar_datos(_base(especie="Hamster"))
+
+    def test_especie_personalizada_activa(self) -> None:
+        reiniciar_catalogo_global()
+        with tempfile.TemporaryDirectory() as tmp:
+            ruta = Path(tmp) / "especies.json"
+            cat = CatalogoEspecies(ruta)
+            cat.anadir(
+                {
+                    "nombre": "Hurón",
+                    "sonido": "Chillidos",
+                    "alimentacion": "Carnívoro",
+                    "cuidados": "Seguridad",
+                }
+            )
+            ge._catalogo_global = cat
+            limpio = validar_datos(_base(especie="Hurón"))
+            self.assertEqual(limpio["especie"], "Hurón")
+        reiniciar_catalogo_global()
+
+    def test_especie_desactivada_permitida_si_es_previa(self) -> None:
+        reiniciar_catalogo_global()
+        with tempfile.TemporaryDirectory() as tmp:
+            ruta = Path(tmp) / "especies.json"
+            cat = CatalogoEspecies(ruta)
+            cat.anadir(
+                {
+                    "nombre": "Hurón",
+                    "sonido": "Chillidos",
+                    "alimentacion": "Carnívoro",
+                    "cuidados": "Seguridad",
+                }
+            )
+            cat.desactivar("Hurón")
+            ge._catalogo_global = cat
+            with self.assertRaisesRegex(ValueError, "especie"):
+                validar_datos(_base(especie="Hurón"))
+            limpio = validar_datos(
+                _base(especie="Hurón"), especie_previa="Hurón"
+            )
+            self.assertEqual(limpio["especie"], "Hurón")
+        reiniciar_catalogo_global()
 
     def test_color_obligatorio(self) -> None:
         with self.assertRaisesRegex(ValueError, "color"):

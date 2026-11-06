@@ -155,7 +155,10 @@ def actualizar_animal(
         ),
     }
     completo = {**datos, **fusion}
-    inventario[animal_id] = validar_datos(completo)
+    inventario[animal_id] = validar_datos(
+        completo,
+        especie_previa=str(actual.get("especie", "")),
+    )
 
 
 def borrar_animal(animal_id: int, inventario: Inventario) -> Dict[str, Any]:
