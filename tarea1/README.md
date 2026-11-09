@@ -1,13 +1,13 @@
-# Tarea 1 — Refugio Animal (programa + defensa)
+# Tarea 1 — Refugio Animal (programa + documentación)
 
 ## Qué hay aquí
 
 | Pieza | Rol |
 | --- | --- |
 | **Programa ejecutable** | Aplicación Tkinter CRUD |
-| **Documentación / defensa** | Markdown, PDF y el cuaderno en la raíz del repo |
+| **Documentación** | Markdown, PDF y el cuaderno en la raíz del repo |
 
-El cuaderno `../gestion_animales_tkinter.ipynb` se usa como **defensa y documentación** paso a paso. El programa real son los `.py` de esta carpeta.
+El cuaderno `../gestion_animales_tkinter.ipynb` se usa como **guion didáctico y documentación** paso a paso. El programa real son los `.py` de esta carpeta.
 
 ### Cuaderno vs programa (`app.py` / `main.py`)
 
@@ -15,7 +15,7 @@ Las dos interfaces **no son idénticas**. El cuaderno enseña el núcleo; la ent
 
 | Aspecto | Cuaderno (`gestion_animales_tkinter.ipynb`) | Programa (`python app.py` o `main.py`) |
 | --- | --- | --- |
-| Rol | Guion didáctico / defensa | Entrega ejecutable |
+| Rol | Guion didáctico | Entrega ejecutable |
 | Código | Celdas autocontenidas | Módulos (`interfaz/gestor.py`, …) |
 | CRUD + filtros + tabla | Sí | Sí |
 | Panel ficha POO (`generar_ficha`) | Sí (versión compacta) | Sí |
@@ -85,6 +85,8 @@ python -m unittest discover -s tarea1/tests -v
 | `tests/test_exportacion_pdf.py` | PDF de fichas |
 | `tests/test_ficha_clinica.py` | Tratamientos, vacunas, docs, foto |
 | `tests/test_modelos_poo.py` | Herencia, `@property`, decoradores, adaptador |
+| `tests/test_gestor_especies.py` | Catálogo dinámico y JSON de especies |
+| `tests/test_portapapeles.py` | Lectura del portapapeles |
 | `tests/test_persistencia_inventario.py` | `inventario.json` carga/guarda |
 
 Dependencia PDF: `pip install fpdf2`
@@ -93,62 +95,42 @@ Dependencia PDF: `pip install fpdf2`
 
 ```text
 tarea1/
-├── app.py                 # Punto de entrada (ventana + mainloop)
-├── main.py                # Alias de app.py
-├── ejecutar_tests.py      # Batería unittest + informe en disco
-├── probar_crud.py         # Mini prueba Create/Read/Update/Delete
+├── app.py / main.py
+├── ejecutar_tests.py / probar_crud.py
+├── pyproject.toml / .python-version
 ├── datos/
-│   ├── __init__.py
-│   ├── constantes.py      # ESPECIES, rangos de peso
-│   ├── inventario.py              # animales_iniciales + CRUD
-│   ├── persistencia_inventario.py # inventario.json (carga/guarda)
-│   ├── ficha.py                   # Tratamientos, vacunas, docs, foto
-│   ├── adjuntos.py                # Copia de archivos a adjuntos/
-│   ├── modelos.py                 # ABC AnimalRefugio + EspeciePersonalizada
-│   ├── decoradores.py             # Decorador propio @cuenta_usos
-│   ├── adaptador_poo.py           # Puente dict ↔ objeto
-│   ├── gestor_especies.py         # Catálogo nativas + personalizadas
-│   ├── especies_personalizadas.json
-│   ├── inventario.json            # (runtime) animales persistidos
-│   └── recursos.py                # Logo refugio.png / .jpg
-├── refugio.jpg            # (o refugio.png) logo GUI + PDF
-├── validaciones/
-│   ├── __init__.py
-│   └── reglas.py          # validar_datos()
+│   ├── constantes.py / inventario.py / persistencia_inventario.py
+│   ├── ficha.py / adjuntos.py / recursos.py
+│   ├── modelos.py / decoradores.py / adaptador_poo.py
+│   ├── gestor_especies.py / especies_personalizadas.json
+│   └── inventario.json            # (runtime; no va en el ZIP)
+├── validaciones/reglas.py
 ├── interfaz/
-│   ├── __init__.py
-│   ├── estilos.py         # Guía de tipografía / ttk.Style
-│   ├── gestor.py          # clase GestorAnimales (Tkinter)
-│   ├── dialogo_especies.py# Gestionar especies (Toplevel)
-│   └── ficha_clinica.py   # Diálogo clínica / adjuntos
-├── exportacion/
-│   ├── __init__.py
-│   └── pdf_fichas.py      # PDF: una ficha por animal (fpdf2)
-├── adjuntos/              # Fotos y documentos importados por animal
-├── muestras/              # Fotos/PDF/DOCX de ejemplo para probar importación
+│   ├── gestor.py / dialogo_especies.py / ficha_clinica.py
+│   ├── estilos.py / vista_foto.py / portapapeles.py
+├── exportacion/pdf_fichas.py
+├── adjuntos/                      # plantilla vacía en el entregable
+├── muestras/                      # fotos y documentos de prueba
 ├── tests/
-│   ├── test_interfaz.py
-│   ├── test_datos.py
-│   ├── test_validaciones.py
-│   ├── test_persistencia_inventario.py
-│   ├── test_exportacion_pdf.py
-│   └── test_ficha_clinica.py
-├── docs/
-│   ├── requisitos.md
-│   ├── casos_de_uso.md
-│   ├── manual_usuario.md
-│   ├── manual_desarrollador.md
-│   ├── uml.md
-│   ├── pruebas.md
-│   └── Arquitectura_Refugio_Animal_v3.pdf
+│   ├── test_datos.py / test_validaciones.py / test_persistencia_inventario.py
+│   ├── test_modelos_poo.py / test_gestor_especies.py
+│   ├── test_interfaz.py / test_ficha_clinica.py
+│   ├── test_portapapeles.py / test_exportacion_pdf.py
+│   └── resultados/
+├── docs/                          # requisitos, CU, UML, manuales, pruebas, PDF arquitectura
 ├── Enunciado_oficial_Tarea_1.pdf
-├── Analisis_defensa_gestion_animales.md
-├── generar_pdf.py
-├── generar_arquitectura_docs.py
+├── Analisis_gestion_animales.md / Tarea_1.pdf
+├── generar_pdf.py / generar_arquitectura_docs.py
+├── refugio.jpg
 └── README.md
 ```
 
-### Responsabilidades (como en la defensa)
+En la raíz del ZIP `entregable_tarea1/` también van:
+
+- `gestion_animales_tkinter.ipynb`
+- `arquitectura_refugio_animal_v3.ipynb`
+
+### Responsabilidades por módulo
 
 | Módulo | Contenido |
 | --- | --- |
@@ -172,7 +154,8 @@ El inventario se manipula en memoria como **diccionarios** y se **persiste** en 
 | [docs/uml.md](docs/uml.md) | UML estructurales y de comportamiento |
 | [docs/pruebas.md](docs/pruebas.md) | Tests e informes en `tests/resultados/` |
 | [muestras/README.md](muestras/README.md) | Fotos y documentos de prueba |
-| [Analisis_defensa_gestion_animales.md](Analisis_defensa_gestion_animales.md) | Guía corta de defensa oral |
+| [Analisis_gestion_animales.md](Analisis_gestion_animales.md) | Análisis breve del proyecto |
+| [Tarea_1.pdf](Tarea_1.pdf) | El mismo análisis en PDF |
 | [docs/Arquitectura_Refugio_Animal_v3.pdf](docs/Arquitectura_Refugio_Animal_v3.pdf) | Análisis de arquitectura (PDF) |
 | [Enunciado_oficial_Tarea_1.pdf](Enunciado_oficial_Tarea_1.pdf) | Enunciado |
 | [../gestion_animales_tkinter.ipynb](../gestion_animales_tkinter.ipynb) | Cuaderno didáctico CRUD / POO |

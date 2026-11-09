@@ -56,8 +56,8 @@ flowchart TB
 
 | Campo | Detalle |
 | --- | --- |
-| Flujo | Ejecutar `app.py` → ventana, inventario de ejemplo, tabla. |
-| Postcondición | 4 animales de ejemplo; panel foto «Sin foto». |
+| Flujo | Ejecutar `app.py` → `cargar_inventario()` → ventana y tabla. |
+| Postcondición | Inventario desde `inventario.json` (o ejemplo sembrado la primera vez). |
 | RF | RF-14 |
 
 ### UC02 — Consultar inventario

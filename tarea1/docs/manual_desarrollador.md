@@ -1,6 +1,6 @@
 # Manual de desarrollador — Refugio Animal
 
-Guía para **mantener y evolucionar** el código ante cambios de enunciado o sugerencias del tribunal. Cada sección indica **qué tocar**, **en qué orden** y **qué verificar**.
+Guía para **mantener y evolucionar** el código ante cambios de enunciado o nuevos requisitos. Cada sección indica **qué tocar**, **en qué orden** y **qué verificar**.
 
 Docs relacionados: [requisitos](requisitos.md) · [casos de uso](casos_de_uso.md) · [UML](uml.md) · [usuario](manual_usuario.md) · [pruebas](pruebas.md).
 
@@ -20,11 +20,11 @@ CRUD Tkinter sobre diccionarios, con ficha clínica, adjuntos, portapapeles, PDF
 | Pruebas | `tests/`, `ejecutar_tests.py` | unittest + informes |
 | Muestras | `muestras/` | Fotos/PDF/DOCX de demo |
 
-El cuaderno `../gestion_animales_tkinter.ipynb` es **defensa/documentación**, no el ejecutable.
+El cuaderno `../gestion_animales_tkinter.ipynb` es **documentación didáctica**, no el ejecutable.
 
 La GUI del cuaderno **no coincide** con `app.py` / `main.py`: es una versión reducida (CRUD + panel POO) para explicar el flujo en celdas. La interfaz de entrega (`interfaz/gestor.py`) añade foto, ficha clínica, PDF, estilos y el mismo panel POO. Tabla comparativa: [../README.md](../README.md#cuaderno-vs-programa-apppy--mainpy).
 
-**Principio de defensa:** la lógica vive fuera de Tkinter. Si el tribunal pide un cambio de regla, casi siempre se responde en `validaciones/` o `datos/`; si pide un cambio visual, en `interfaz/`.
+**Principio de diseño:** la lógica vive fuera de Tkinter. Si cambia una regla, casi siempre se responde en `validaciones/` o `datos/`; si cambia algo visual, en `interfaz/`.
 
 ---
 
@@ -102,7 +102,7 @@ tarea1/
 
 ## 5. Mapa de impacto (qué capa tocar)
 
-Usa esta tabla en defensa: *«según el tipo de cambio, se modifica esta capa»*.
+Usa esta tabla como guía: *«según el tipo de cambio, se modifica esta capa»*.
 
 | Tipo de petición | Capa principal | Archivos típicos |
 | --- | --- | --- |
@@ -195,9 +195,9 @@ Todo el look & feel centralizado en `interfaz/estilos.py` (`aplicar_tema`, `conf
 
 ---
 
-## 7. Catálogo de alteraciones (defensa)
+## 7. Catálogo de alteraciones frecuentes
 
-Casos que el tribunal suele pedir. Para cada uno: **dónde** y **qué no olvidar**.
+Casos típicos de extensión o cambio. Para cada uno: **dónde** y **qué no olvidar**.
 
 ### 7.1 Nuevo campo en la ficha (ej. `sexo`, `chip`, `estado_adopcion`)
 
@@ -306,7 +306,7 @@ Escritura atómica (temporal + `replace`). No meter I/O dentro de `validar_datos
 
 ### 7.10b Sustituir del todo el inventario por objetos
 
-Si el tribunal pidiera *solo* clases (sin dict):
+Si se quisiera usar *solo* clases (sin dict):
 
 1. Inventario `Dict[int, AnimalRefugio]` (o lista).  
 2. Serializar clínica en atributos o composición (`FichaClinica`).  
@@ -351,7 +351,7 @@ No hay i18n: literales en español en UI y `ValueError`. Para un cambio puntual,
 - Inventario inyectado: `app.py` / `main.py` (`cargar_inventario()` → `GestorAnimales`).  
 - Para demos: se puede pasar otro `dict` y `persistir=False` sin tocar la clase.
 
-### 7.16 Tests y regresión tras un cambio del tribunal
+### 7.16 Tests y regresión tras un cambio
 
 ```bash
 python ejecutar_tests.py
@@ -370,17 +370,17 @@ python ejecutar_tests.py
 
 ### 7.17 Documentación que debe ir al día
 
-Tras un cambio aceptado en defensa:
+Tras un cambio aceptado:
 
 1. `docs/requisitos.md` (RF / RN)  
 2. `docs/manual_usuario.md` (si el usuario lo nota)  
 3. `docs/casos_de_uso.md` / `uml.md` si cambia el flujo o el modelo  
 4. Este manual si aparece un **tipo nuevo** de extensión  
-5. `Analisis_defensa_gestion_animales.md` si la pregunta típica de oral cambia
+5. `Analisis_gestion_animales.md` si cambia el resumen del proyecto
 
 ---
 
-## 8. Interfaz — detalles técnicos útiles en oral
+## 8. Interfaz — detalles técnicos útiles
 
 ### Tipografía
 
@@ -417,7 +417,7 @@ No usar `ctypes.wstring_at` sin `GlobalLock` tipado (provocaba access violation)
 
 ---
 
-## 10. Frases útiles ante el tribunal
+## 10. Frases útiles para explicar el diseño
 
 - *«La validación está centralizada en `validar_datos`; la interfaz solo captura y muestra errores.»*  
 - *«Para una especie nueva solo tocamos `ESPECIES`; el combobox y el filtro se alimentan de esa tupla.»*  
@@ -428,7 +428,7 @@ No usar `ctypes.wstring_at` sin `GlobalLock` tipado (provocaba access violation)
 
 ---
 
-## 11. Checklist de entrega / defensa
+## 11. Checklist de entrega
 
 - [ ] `python app.py` (o `main.py`)  
 - [ ] CRUD + filtros + ficha clínica + pegar/importar ≤ 5 MB  

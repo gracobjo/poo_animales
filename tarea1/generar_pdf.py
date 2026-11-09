@@ -1,4 +1,4 @@
-"""Genera Tarea_1.pdf a partir del análisis de defensa (Unicode con Arial)."""
+"""Genera Tarea_1.pdf a partir del análisis del proyecto (Unicode con Arial)."""
 
 from pathlib import Path
 
@@ -19,7 +19,7 @@ class PdfTarea(FPDF):
         self.cell(
             0,
             8,
-            "Tarea 1 — Análisis y defensa · Refugio Animal (Tkinter)",
+            "Tarea 1 — Análisis del proyecto · Refugio Animal (Tkinter)",
             new_x="LMARGIN",
             new_y="NEXT",
         )
@@ -98,7 +98,7 @@ def main() -> None:
     pdf.multi_cell(0, 9, "Tarea 1")
     _reset_x(pdf)
     pdf.set_font("ArialDoc", "B", 14)
-    pdf.multi_cell(0, 8, "Analisis y defensa del proyecto")
+    pdf.multi_cell(0, 8, "Analisis del proyecto")
     pdf.ln(2)
     _reset_x(pdf)
     escribir_parrafo(
@@ -110,7 +110,7 @@ def main() -> None:
     )
     escribir_parrafo(
         pdf,
-        "Documento para explicar y defender el trabajo: organización, "
+        "Documento que resume el trabajo: organización, "
         "relación con Tema 2 (POO/estructuras) y Tema 3 (Tkinter), "
         "y respuestas a posibles cambios de refactorización.",
     )
@@ -130,9 +130,10 @@ def main() -> None:
     )
     escribir_parrafo(
         pdf,
-        "Dato clave: los datos viven en un diccionario EN MEMORIA. "
-        "No hay base de datos. Es deliberado: el objetivo es practicar "
-        "Tkinter y estructuras del lenguaje, no la persistencia.",
+        "Dato clave: el CRUD trabaja con DICCIONARIOS (como pide el enunciado). "
+        "No hay base de datos relacional. El inventario se persiste en "
+        "datos/inventario.json y las especies personalizadas en "
+        "datos/especies_personalizadas.json (archivos separados).",
     )
 
     escribir_titulo(pdf, "2. Idea general")
@@ -146,7 +147,8 @@ def main() -> None:
     escribir_parrafo(
         pdf,
         "Frase de apertura recomendada: «Es una aplicación CRUD con Tkinter "
-        "que separa la lógica de datos (funciones sobre un diccionario) de la "
+        "sobre diccionarios persistidos en JSON, que separa datos/validación "
+        "de la "
         "lógica de interfaz (clase GestorAnimales).»",
     )
 
@@ -219,10 +221,10 @@ def main() -> None:
     escribir_titulo(pdf, "9. Preguntas de refactorización (respuestas cortas)")
     preguntas = [
         "1. Nueva especie Conejo: añadirla a ESPECIES; Combobox y filtro se actualizan solos.",
-        "2. Persistencia: JSON (simple), CSV, o SQLite (más correcto); las firmas CRUD apenas cambian.",
-        "3. Módulos: datos.py (CRUD), validaciones.py, interfaz.py (GestorAnimales), main.py (arranque).",
+        "2. Persistencia: ya hay inventario.json y especies_personalizadas.json; SQLite sería evolución.",
+        "3. Módulos: datos/, validaciones/, interfaz/, exportacion/, app.py (arranque).",
         "4. Campo chip: registro + validación + Checkbutton/BooleanVar + columna Treeview + seleccionar/formulario.",
-        "5. ¿Por qué no clases? El enunciado pedía diccionarios; POO sería una segunda versión.",
+        "5. POO: capa paralela con AnimalRefugio + adaptador; el CRUD sigue en diccionarios.",
         "6. Nombres repetidos: no hay problema; el único es el ID.",
         "7. Estadísticas: Toplevel con Counter por especie y medias; opcional Canvas/matplotlib.",
         "8. ¿Por qué borrar/reinsertar la tabla? Con filtros es más simple; en inventarios pequeños es suficiente.",
@@ -232,7 +234,7 @@ def main() -> None:
     for p in preguntas:
         escribir_viñeta(pdf, p)
 
-    escribir_titulo(pdf, "10. Consejos para la defensa")
+    escribir_titulo(pdf, "10. Consejos para explicar el proyecto")
     for linea in [
         "Empieza por lo general: CRUD + separación datos/GUI.",
         "Nombra principios: validación con excepciones, variables de control, gestores de geometría.",
@@ -248,7 +250,8 @@ def main() -> None:
         "Probar crear/editar/borrar y filtros.",
         "Provocar un error de validación y mostrar el messagebox.",
         "Señalar validar_datos y el Treeview.",
-        "Tener listas las respuestas de especie nueva y JSON.",
+        "Tener listas las respuestas de especie nueva e inventario.json.",
+        "Mostrar que especies e inventario son JSON distintos.",
         "Relacionar al menos 5 widgets con lecciones del Tema 3.",
     ]:
         escribir_viñeta(pdf, linea)

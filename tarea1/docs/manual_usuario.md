@@ -2,12 +2,13 @@
 
 ## 1. ¿Qué es?
 
-Aplicación de escritorio para el inventario de un refugio (perros, gatos y loros): alta/consulta/edición/borrado, búsqueda, ficha clínica (tratamientos, vacunas), documentos, foto y exportación a PDF.
+Aplicación de escritorio para el inventario de un refugio (especies nativas y personalizadas): alta/consulta/edición/borrado, búsqueda, ficha clínica (tratamientos, vacunas), documentos, foto y exportación a PDF.
 
 **Importante**
 
-- El **inventario** vive en memoria: al cerrar la app se pierden altas/cambios de esa sesión (vuelve el ejemplo).
-- Los **archivos** (fotos/documentos) sí se guardan en `tarea1/adjuntos/<id>/` y permanecen en disco.
+- El **inventario de animales** se guarda en `tarea1/datos/inventario.json` (sobrevive al cerrar la app).
+- Las **especies personalizadas** se guardan en `tarea1/datos/especies_personalizadas.json`.
+- Los **archivos** (fotos/documentos) van en `tarea1/adjuntos/<id>/`.
 
 ---
 
@@ -15,7 +16,7 @@ Aplicación de escritorio para el inventario de un refugio (perros, gatos y loro
 
 | Necesitas | Para qué |
 | --- | --- |
-| Python 3.8+ con Tkinter | Interfaz |
+| Python 3.14+ con Tkinter | Interfaz |
 | `fpdf2` | Exportar PDF (`pip install fpdf2`) |
 | `Pillow` (recomendado) | Pegar imágenes / vista previa JPG |
 
@@ -144,7 +145,7 @@ Guía: [../muestras/README.md](../muestras/README.md).
 | Campo | Regla |
 | --- | --- |
 | Nombre, color | Obligatorios |
-| Especie | Perro / Gato / Loro |
+| Especie | Nativas o personalizadas activas (desplegable) |
 | Edad | Entero 0–30 |
 | Peso | Entre 0.01 y 100 kg (vale `3,8`) |
 | Observaciones | Opcional |
@@ -159,7 +160,7 @@ Guía: [../muestras/README.md](../muestras/README.md).
 | «Selecciona un animal…» | Marca una fila en la tabla |
 | Pegar dice que no hay nada | Copia el **archivo** en el Explorador (no solo el nombre en el IDE) |
 | Archivo demasiado grande | Usa uno ≤ 5 MB |
-| Perdí altas al cerrar | Normal: inventario sin persistencia; los adjuntos en `adjuntos/` sí quedan |
+| Perdí el `inventario.json` | Se regenera el ejemplo al arrancar; las altas previas solo vuelven si restauras el archivo |
 | PDF tarda en abrirse | Vuelve a exportar con la versión actual (sin `/FitH`) |
 | No veo ñ / tildes en botones | Reinicia la app tras actualizar el código |
 
@@ -167,4 +168,4 @@ Guía: [../muestras/README.md](../muestras/README.md).
 
 ## 8. Cerrar
 
-Cierra la ventana. No hay «Guardar inventario»: la sesión termina.
+Cierra la ventana. El inventario y las especies personalizadas ya están guardados en sus JSON; no hace falta un botón «Guardar» aparte.

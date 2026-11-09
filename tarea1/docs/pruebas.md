@@ -13,6 +13,8 @@ Los tests viven en `tarea1/tests/` y usan el módulo estándar **`unittest`**.
 | `test_exportacion_pdf.py` | Exportación PDF y botón Exportar |
 | `test_ficha_clinica.py` | Tratamientos, vacunas, documentos, foto |
 | `test_modelos_poo.py` | Herencia ABC, `@property`, decoradores, adaptador dict↔objeto |
+| `test_gestor_especies.py` | Catálogo dinámico y persistencia de especies |
+| `test_portapapeles.py` | Lectura del portapapeles (archivos / texto) |
 
 La interfaz se prueba con la ventana oculta (`withdraw`) y `messagebox` / diálogos simulados (`unittest.mock`), para no bloquear la batería.
 
@@ -92,7 +94,7 @@ python -m unittest discover -s tarea1/tests -v *>&1 | Tee-Object -FilePath tarea
 
 Los informes incluyen: fecha, número de tests, errores, fallos, omitidos, veredicto OK/FALLO y el log verbose de `unittest`.
 
-**Nota:** la carpeta `resultados/` está en `.gitignore` (salvo `.gitkeep`), para no versionar informes locales. En la defensa puedes abrir `ultimo_informe.txt` o regenerarlo al momento.
+**Nota:** la carpeta `resultados/` está en `.gitignore` (salvo `.gitkeep`), para no versionar informes locales. Puedes abrir `ultimo_informe.txt` o regenerarlo al momento.
 
 Los PDFs de exportación de fichas **no** son el resultado de los tests; se guardan donde elijas en el diálogo «Guardar». Los adjuntos clínicos van a `tarea1/adjuntos/<id>/`.
 
@@ -149,7 +151,7 @@ Ver [../muestras/README.md](../muestras/README.md). No sustituyen a `unittest`; 
 
 ---
 
-## 7. Relación con la defensa
+## 7. Cómo presentar las pruebas
 
 - Señalar `tarea1/tests/` como evidencia de testabilidad (RNF-07).
 - Ejecutar `python tarea1/ejecutar_tests.py` y mostrar `tests/resultados/ultimo_informe.txt`.

@@ -420,7 +420,7 @@ Con uv: `uv sync` y `uv run python app.py`."""
 | 3 | Especies dinámicas + JSON + ficha POO completa |
 | 3+ | Persistencia del inventario de animales |
 
-**Recorrido recomendado para la defensa:** crear especie Hurón → registrar Nico → seleccionar → explicar adaptador + `EspeciePersonalizada` + `generar_ficha()` → cerrar y reabrir la app para mostrar que el inventario persistió."""
+**Recorrido recomendado de demo:** crear especie Hurón → registrar Nico → seleccionar → explicar adaptador + `EspeciePersonalizada` + `generar_ficha()` → cerrar y reabrir la app para mostrar que el inventario persistió."""
     ),
 ]
 
@@ -645,7 +645,7 @@ def construir_pdf() -> None:
     ):
         _viñeta(pdf, item)
 
-    _titulo(pdf, "11. Evolucion y defensa")
+    _titulo(pdf, "11. Evolucion del proyecto")
     _tabla(
         pdf,
         [

@@ -11,8 +11,8 @@ F = TypeVar("F", bound=Callable[..., Any])
 def cuenta_usos(metodo: F) -> F:
     """Decorador de método de instancia: cuenta cuántas veces se invoca.
 
-    El contador vive en ``self._usos_<nombre_metodo>``. Sirve en defensa
-    para mostrar un decorador propio además de ``@property`` / ``@abstractmethod``.
+    El contador vive en ``self._usos_<nombre_metodo>``. Sirve para
+    mostrar un decorador propio además de ``@property`` / ``@abstractmethod``.
     """
 
     @wraps(metodo)

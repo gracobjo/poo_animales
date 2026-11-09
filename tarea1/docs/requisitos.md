@@ -1,6 +1,6 @@
 # Requisitos — Refugio Animal
 
-Sistema: aplicación de escritorio (Tkinter) para gestionar el inventario de un refugio con CRUD sobre un **diccionario en memoria**, capa POO didáctica (herencia / properties), ficha clínica, adjuntos, exportación PDF y batería de pruebas.
+Sistema: aplicación de escritorio (Tkinter) para gestionar el inventario de un refugio con CRUD sobre **diccionarios**, persistencia JSON del inventario y del catálogo de especies, capa POO didáctica (herencia / properties), ficha clínica, adjuntos, exportación PDF y batería de pruebas.
 
 ---
 
@@ -24,7 +24,8 @@ Sistema: aplicación de escritorio (Tkinter) para gestionar el inventario de un 
 | RF-11 | **Limpiar** formulario, selección y panel de foto. | Media | Botón Limpiar |
 | RF-12 | Mostrar **estado** (totales, visibles, última acción, resumen clínico). | Media | `estado_var` |
 | RF-13 | Ante errores o falta de selección, mostrar **diálogos** claros. | Alta | `messagebox` |
-| RF-14 | Al arrancar, cargar **inventario de ejemplo** (sin persistencia de sesión). | Alta | `animales_iniciales()` |
+| RF-14 | Al arrancar, **cargar el inventario** desde `datos/inventario.json`; si no existe, sembrar el ejemplo y crearlo. | Alta | `persistencia_inventario.cargar_inventario()` |
+| RF-14b | **Persistir** el inventario tras crear / actualizar / borrar / cambios clínicos (JSON distinto del catálogo de especies). | Alta | `guardar_inventario()` + `GestorAnimales._persistir_inventario()` |
 
 ### 1.2 Exportación PDF
 
@@ -48,7 +49,7 @@ Sistema: aplicación de escritorio (Tkinter) para gestionar el inventario de un 
 | ID | Regla |
 | --- | --- |
 | RN-01 | Nombre y color obligatorios (tras `strip`). |
-| RN-02 | Especie ∈ `ESPECIES`. |
+| RN-02 | Especie activa del catálogo (nativas + personalizadas) en altas nuevas. |
 | RN-03 | Edad: entero entre 0 y 30. |
 | RN-04 | Peso: número finito entre 0.01 y 100 kg (ambos inclusive el máximo). |
 | RN-05 | Nuevo ID = `max(inventario)+1` (o 1). |
@@ -68,11 +69,11 @@ Sistema: aplicación de escritorio (Tkinter) para gestionar el inventario de un 
 | RNF-02 | Usabilidad | Mensajes en español correcto (ñ, tildes) comprensibles. | Textos UI / `ValueError` |
 | RNF-03 | Fiabilidad | Datos inválidos no corrompen el inventario. | Validación previa |
 | RNF-04 | Mantenibilidad | Separación: datos, validaciones, interfaz, exportación, arranque. | Paquetes bajo `tarea1/` |
-| RNF-05 | Portabilidad | Python 3.8+; GUI con `tkinter`. Dependencias opcionales/documentadas: `fpdf2`, `Pillow`. | `requirements.txt` |
+| RNF-05 | Portabilidad | Python ≥ 3.14; GUI con `tkinter`. Dependencias: `fpdf2` (PDF); `Pillow` opcional. | `pyproject.toml` |
 | RNF-06 | Rendimiento | Filtrar/refrescar tabla inmediato en inventarios pequeños/medios. | Dict en RAM |
 | RNF-07 | Testabilidad | Pruebas automatizadas + informe en disco. | `ejecutar_tests.py` → `tests/resultados/` |
 | RNF-08 | Integridad | Confirmación en borrados; límite de tamaño en adjuntos. | `askyesno`, 5 MB |
-| RNF-09 | Limitación | Inventario de sesión **sin** persistencia al cerrar (adjuntos en disco sí permanecen). | Diseño / enunciado |
+| RNF-09 | Persistencia | Inventario en `datos/inventario.json`; especies personalizadas en `datos/especies_personalizadas.json`; adjuntos en `adjuntos/<id>/`. Escritura atómica. | `persistencia_inventario.py`, `gestor_especies.py` |
 | RNF-10 | Documentación | Requisitos, CU, UML, manuales, pruebas y muestras. | `docs/`, `muestras/` |
 | RNF-11 | Usabilidad tipográfica | Guía de estilos única (`Segoe UI` / Helvetica) en ttk y `tk.Text`. | `interfaz/estilos.py` |
 | RNF-12 | Apertura de PDF | PDF ligeros (fuentes estándar) sin `/FitH` que ralentice visores. | `set_display_mode(100,"single")` |
@@ -82,8 +83,7 @@ Sistema: aplicación de escritorio (Tkinter) para gestionar el inventario de un 
 ## 3. Fuera de alcance (esta versión)
 
 - Base de datos remota / multiusuario / autenticación.
-- Persistencia automática del inventario al cerrar (JSON/SQLite serían evolución).
-- Clases de dominio `Animal` / herencia (proyecto padre `animales_poo`).
+- SQLite u otro motor distinto de los JSON locales.
 - API HTTP.
 
-Ver evoluciones en [manual_desarrollador.md](manual_desarrollador.md).
+La persistencia del inventario en JSON **ya está implementada** (separada del catálogo de especies). Ver [manual_desarrollador.md](manual_desarrollador.md) §7.9.

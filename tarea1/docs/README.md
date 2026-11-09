@@ -15,6 +15,6 @@
 **Programa (GUI completa):** `python tarea1/app.py` o `python tarea1/main.py`  
 **Pruebas:** `python tarea1/ejecutar_tests.py` → `tarea1/tests/resultados/`  
 **Muestras:** [../muestras/README.md](../muestras/README.md)  
-**Defensa rápida:** [../Analisis_defensa_gestion_animales.md](../Analisis_defensa_gestion_animales.md)  
+**Análisis breve:** [../Analisis_gestion_animales.md](../Analisis_gestion_animales.md) · [../Tarea_1.pdf](../Tarea_1.pdf)  
 **Cuaderno (demo didáctica, GUI reducida):** [../../gestion_animales_tkinter.ipynb](../../gestion_animales_tkinter.ipynb) — diferencias en [../README.md](../README.md#cuaderno-vs-programa-apppy--mainpy)  
 **Cuaderno de arquitectura v3:** [../../arquitectura_refugio_animal_v3.ipynb](../../arquitectura_refugio_animal_v3.ipynb)

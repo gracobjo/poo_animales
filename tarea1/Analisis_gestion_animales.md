@@ -1,15 +1,15 @@
-# Tarea 1 — Análisis y defensa del proyecto
+# Tarea 1 — Análisis del proyecto
 
 **Programa ejecutable:** `app.py` (`datos/`, `validaciones/`, `interfaz/`, `exportacion/`)  
 **Documentación formal:** carpeta [`docs/`](docs/README.md) (requisitos RF/RNF, CU, UML, manuales, pruebas)  
-**Defensa oral / narrada:** este Markdown/PDF + `../gestion_animales_tkinter.ipynb`  
+**Guía y cuaderno:** este Markdown/PDF + `../gestion_animales_tkinter.ipynb`  
 **Enunciado oficial:** `Enunciado_oficial_Tarea_1.pdf`  
 **Fecha de entrega (enunciado):** 12 de noviembre de 2026  
 
-Este documento sirve para **explicar y defender** el trabajo ante el tribunal: qué hace, cómo está organizado, qué del temario se aplica y cómo responder a cambios de refactorización.
+Este documento resume el trabajo: qué hace, cómo está organizado, qué del temario se aplica y cómo abordar cambios de refactorización.
 
 **Arranque (entrega):** `cd tarea1` → `python app.py` (o `python main.py`)  
-**Extras respecto al enunciado mínimo:** ficha clínica, foto/documentos (importar/pegar, máx. 5 MB), exportación PDF, ficha POO en la GUI, **especies personalizadas** (JSON + `EspeciePersonalizada`), tests con informe en disco.
+**Extras respecto al enunciado mínimo:** ficha clínica, foto/documentos (importar/pegar, máx. 5 MB), exportación PDF, ficha POO en la GUI, **especies personalizadas** (JSON + `EspeciePersonalizada`), **persistencia del inventario** (`inventario.json`), tests con informe en disco.
 
 **Cuaderno ≠ programa.** El `.ipynb` es un guion didáctico (CRUD + ficha POO con scrollbars + demo de `EspeciePersonalizada`). La ventana completa (foto, clínica, PDF, *Gestionar especies*, estilos) solo sale de `tarea1/app.py`. Ver tabla en [README.md](README.md#cuaderno-vs-programa-apppy--mainpy).
 
@@ -25,7 +25,7 @@ Este documento sirve para **explicar y defender** el trabajo ante el tribunal: q
 | Interfaz con `tkinter` | Clase `GestorAnimales` + widgets `tk` / `ttk` |
 | Presentación con posibles cambios | Ver sección 8 (preguntas de refactorización) |
 
-**Dato clave para defender:** los datos viven en un **diccionario en memoria**. No hay base de datos. Es deliberado: el objetivo es practicar **Tkinter** y estructuras del lenguaje, no persistencia.
+**Dato clave:** el CRUD trabaja con **diccionarios** (como pide el enunciado). No hay base de datos relacional. Además, el inventario se **persiste** en `datos/inventario.json` y el catálogo de especies personalizadas en `datos/especies_personalizadas.json` (archivos separados).
 
 ---
 
@@ -42,9 +42,9 @@ Aplicación de escritorio CRUD sobre un inventario de animales, ampliada con fic
 | Clínica / adjuntos | `adjuntos.py` + listas en el `dict` | `DialogoFichaClinica` |
 | Exportar | `exportar_fichas_pdf()` | `_exportar_pdf()` |
 
-Frase de apertura recomendada en la defensa:
+Resumen en una frase:
 
-> Es una aplicación CRUD con Tkinter sobre un diccionario: separamos datos, validación e interfaz; además hay ficha clínica, pegado de adjuntos (límite 5 MB) y exportación a PDF.
+> Es una aplicación CRUD con Tkinter sobre diccionarios persistidos en JSON: separamos datos, validación e interfaz; además hay ficha clínica, especies dinámicas, pegado de adjuntos (límite 5 MB) y exportación a PDF.
 
 ---
 
@@ -66,7 +66,7 @@ El enunciado exige **diccionario + CRUD + Tkinter**. La ficha vive en un `dict`;
 | Especies dinámicas | Nativas (clases fijas) + personalizadas (`EspeciePersonalizada` + `especies_personalizadas.json`) vía *Gestionar especies* |
 | Validación procedural | `validar_datos()` sigue siendo la puerta del CRUD (coherente con los setters) |
 
-**Frase de defensa:** *«El CRUD trabaja con diccionarios, como pide el enunciado; la herencia y las properties son una capa didáctica conectada por un adaptador.»*
+**Idea clave:** *«El CRUD trabaja con diccionarios, como pide el enunciado; la herencia y las properties son una capa didáctica conectada por un adaptador.»*
 
 ### 3.2 Tema 3 — Interfaces gráficas aplicadas
 
@@ -228,11 +228,12 @@ Añadir `"Conejo"` a la tupla `ESPECIES`. Combobox y filtro la leen de ahí; no 
 
 ### 2. ¿Cómo guardar datos entre sesiones?
 
-De menor a mayor complejidad:
+**Ya está hecho con JSON**, en dos archivos distintos:
 
-1. **JSON** al cerrar / abrir (`dump` / `load`; adaptar IDs si llegan como string).
-2. **CSV** (más plano; se pierde anidamiento).
-3. **SQLite** (tabla `animales` con `PRIMARY KEY`; las firmas CRUD apenas cambian).
+1. **Inventario:** `datos/persistencia_inventario.py` → `inventario.json` (carga al arrancar; guarda tras CRUD/clínica).
+2. **Especies personalizadas:** `datos/gestor_especies.py` → `especies_personalizadas.json`.
+
+Evoluciones posibles: CSV (más plano) o **SQLite** (tabla `animales` con `PRIMARY KEY`).
 
 ### 3. ¿Cómo separarías el código en archivos?
 
@@ -241,9 +242,11 @@ Ya está hecho en `tarea1/`:
 | Carpeta / archivo | Contenido |
 | --- | --- |
 | `datos/constantes.py` + `inventario.py` | `ESPECIES`, inventario inicial, CRUD |
+| `datos/persistencia_inventario.py` | Carga/guarda `inventario.json` |
+| `datos/gestor_especies.py` | Catálogo + `especies_personalizadas.json` |
 | `validaciones/reglas.py` | `validar_datos` |
 | `interfaz/gestor.py` | `GestorAnimales` |
-| `app.py` / `main.py` | Arranque (`Tk` + `mainloop`) |
+| `app.py` / `main.py` | Arranque (`cargar_inventario` + `Tk` + `mainloop`) |
 
 Ejecución: `python app.py` desde `tarea1/`.
 
@@ -289,26 +292,27 @@ y en `_confirmar_salida` un `askyesno`.
 
 ---
 
-## 10. Consejos para la defensa oral
+## 10. Consejos para explicar el proyecto
 
 1. Empieza por lo general (CRUD + separación datos/GUI).  
 2. Nombra principios: validación con excepciones, variables de control, gestores de geometría.  
-3. Si piden un cambio en vivo: lee el código, di el plan en voz alta, luego edita.  
-4. Si no está implementado: “lo haría así…” y describe el enfoque.  
+3. Ante un cambio: lee el código, formula el plan y luego edita.  
+4. Si algo no está implementado: describe el enfoque (“se haría así…”).  
 5. Domina `pack` / `grid` / `place` (aquí no se usa `place`).
 
 ---
 
-## 11. Checklist rápido antes de presentar
+## 11. Checklist rápido de entrega
 
 - [ ] Ejecutar `python app.py`: CRUD, filtros, ficha clínica, pegar/importar ≤ 5 MB, foto, exportar PDF.  
 - [ ] Ejecutar `python ejecutar_tests.py` y abrir `tests/resultados/ultimo_informe.txt`.  
 - [ ] (Opcional) `python probar_crud.py` para mostrar el CRUD sin GUI.  
 - [ ] Provocar un error de validación y mostrar el `messagebox`.  
 - [ ] Señalar módulos clave y diagramas en [docs/uml.md](docs/uml.md) / [docs/requisitos.md](docs/requisitos.md).  
-- [ ] Tener respuesta lista para “añadir especie” y “guardar en JSON”.  
+- [ ] Tener respuesta lista para “añadir especie” y “dónde se guarda el inventario”.  
+- [ ] Mostrar `inventario.json` ≠ `especies_personalizadas.json`.  
 - [ ] Relacionar al menos 5 widgets con lecciones del Tema 3.  
-- [ ] Usar el cuaderno solo como guion de defensa / documentación (no como sustituto de `app.py`).  
+- [ ] Usar el cuaderno solo como guion didáctico / documentación (no como sustituto de `app.py`).  
 - [ ] Si alguien ejecuta el notebook: aclarar que la GUI completa es `python app.py`.  
 - [ ] Conocer [docs/pruebas.md](docs/pruebas.md) y [docs/manual_usuario.md](docs/manual_usuario.md).
 
@@ -325,10 +329,13 @@ y en `_confirmar_salida` un `askyesno`.
 | `docs/pruebas.md` | Cómo ejecutar tests y dónde se guarda el resultado |
 | `muestras/` | Fotos y PDF/DOCX de ejemplo para probar importación |
 | `Enunciado_oficial_Tarea_1.pdf` | PDF del profesor |
-| `Analisis_defensa_gestion_animales.md` | Esta guía (Markdown) |
+| `Analisis_gestion_animales.md` | Esta guía (Markdown) |
 | `Tarea_1.pdf` | Esta guía en PDF |
+| `docs/Arquitectura_Refugio_Animal_v3.pdf` | Análisis de arquitectura (PDF) |
+| `generar_pdf.py` / `generar_arquitectura_docs.py` | Regeneran los PDF de documentación |
 | `README.md` | Índice de la carpeta |
-| `../gestion_animales_tkinter.ipynb` | Defensa / documentación narrada |
+| `../gestion_animales_tkinter.ipynb` | Cuaderno didáctico / documentación narrada |
+| `../arquitectura_refugio_animal_v3.ipynb` | Cuaderno de arquitectura v3 |
 | `docs/` | Requisitos (RF/RNF), CU, UML, manuales, pruebas |
 | `exportacion/` | PDF de fichas |
 | `adjuntos/` | Fotos/documentos importados por animal |

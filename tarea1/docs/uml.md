@@ -426,7 +426,7 @@ flowchart TD
 
 ---
 
-## 3. Uso en la defensa
+## 3. Cómo usar estos diagramas
 
 | Pregunta | Diagrama |
 | --- | --- |
