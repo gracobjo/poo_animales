@@ -20,11 +20,11 @@ Las dos interfaces **no son idénticas**. El cuaderno enseña el núcleo; la ent
 | CRUD + filtros + tabla | Sí | Sí |
 | Panel ficha POO (`generar_ficha`) | Sí (versión compacta) | Sí |
 | Scrollbars en ficha (comportamiento / alimentación / cuidados) | Sí | Sí |
-| Especies personalizadas (`EspeciePersonalizada`) | Demo en celdas (+ JSON simple opcional) | Completo: *Gestionar especies* + JSON |
-| Miniatura de foto en el formulario | No | Sí |
-| Botón ficha clínica / adjuntos | No | Sí |
-| Exportar PDF | No | Sí |
-| Persistencia inventario (`inventario.json`) | No | Sí |
+| Especies personalizadas (`EspeciePersonalizada`) | Demo celdas + §5.2 JSON | Completo: *Gestionar especies* + JSON |
+| Miniatura de foto en el formulario | Explicado §5.4 | Sí |
+| Botón ficha clínica / adjuntos | Demo esquema §5.3 | Sí (diálogo completo) |
+| Exportar PDF | Explicado §5.4 | Sí |
+| Persistencia inventario (`inventario.json`) | Demo §5.1 | Sí |
 | Estilos / tipografía (`estilos.py`) | Básicos de ttk | Tema completo |
 | Título de ventana | *…(demo cuaderno)* | *Refugio Animal - Gestión de animales* |
 
