@@ -1,0 +1,7 @@
+[project]
+name = "tarea1"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "fpdf2>=2.9.0",
+]
